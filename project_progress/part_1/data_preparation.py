@@ -36,6 +36,7 @@ class ProcessedDocument(BaseModel):
     brand_normalized: Optional[str] = None
     category_normalized: Optional[str] = None
     sub_category_normalized: Optional[str] = None
+    product_details_processed: Optional[List[str]] = None
     seller_normalized: Optional[str] = None
     search_text: Optional[str] = None
 
@@ -77,6 +78,8 @@ class ProcessedDocument(BaseModel):
         self.category_normalized = self._normalize_category_field(self.category)
         self.sub_category_normalized = self._normalize_category_field(self.sub_category)
         self.seller_normalized = self._normalize_category_field(self.seller)
+
+        self.product_details_processed = self._process_product_details()
 
         self.search_text = self._combine_search_text()
 
@@ -125,6 +128,26 @@ class ProcessedDocument(BaseModel):
         value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("utf-8", "ignore")
         return value.strip().lower()
 
+    def _process_product_details(self) -> List[str]:
+        """
+        Flatten product_details list of dicts into a list of normalized strings containing keys and values.
+        Example:
+        [{"Type":"Round Neck"}, {"Sleeve":"Half Sleeve"}] 
+        → ["type", "round neck", "sleeve", "half sleeve"]
+        """
+        if not self.product_details:
+        return []
+
+        result = []
+        for item in self.product_details:
+            if isinstance(item, dict):
+                for k, v in item.items():
+                    if k:
+                        result.append(self._normalize_category_field(str(k)))
+                    if v:
+                        result.append(self._normalize_category_field(str(v)))               
+        return result
+
     def _combine_search_text(self) -> str:
         """Combine all relevant text fields into a single search text string."""
         parts = []
@@ -138,6 +161,8 @@ class ProcessedDocument(BaseModel):
             parts.append(self.category_normalized)
         if self.sub_category_normalized:
             parts.append(self.sub_category_normalized)
+        if self.product_details_processed:
+            parts += self.product_details_processed
         if self.seller_normalized:
             parts.append(self.seller_normalized)
 
