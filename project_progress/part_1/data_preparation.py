@@ -35,10 +35,10 @@ class ProcessedDocument(BaseModel):
     description_processed: Optional[List[str]] = None
     brand_normalized: Optional[str] = None
     category_normalized: Optional[str] = None
-    sub_category_normalized: Optional[str] = None
+    sub_category_normalized: Optional[Dict[str, Any]] = None
     product_details_processed: Optional[List[str]] = None
     seller_normalized: Optional[str] = None
-    search_text: Optional[str] = None
+    search_text: Optional[List[str]] = None
 
     # --- CLASS METHODS ---
 
@@ -49,7 +49,7 @@ class ProcessedDocument(BaseModel):
         It copies fields first, and you can later call process_fields().
         """
         return cls(
-            _id=doc._id,
+            _id=getattr(doc, "_id", None),
             pid=doc.pid,
             title=doc.title,
             description=doc.description,
@@ -104,6 +104,7 @@ class ProcessedDocument(BaseModel):
             tokens = word_tokenize(text)
         except LookupError:
             nltk.download("punkt", quiet=True)
+            nltk.download("punkt_tab", quiet=True)
             tokens = word_tokenize(text)
 
         # Remove stopwords
@@ -128,27 +129,27 @@ class ProcessedDocument(BaseModel):
         value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("utf-8", "ignore")
         return value.strip().lower()
 
-    def _process_product_details(self) -> List[str]:
+    def _process_product_details(self) -> Dict[str, Optional[str]]:
         """
-        Flatten product_details list of dicts into a list of normalized strings containing keys and values.
+        Process product_details into a dictionary of normalized key-value pairs.
         Example:
-        [{"Type":"Round Neck"}, {"Sleeve":"Half Sleeve"}] 
-        → ["type", "round neck", "sleeve", "half sleeve"]
+        [{"Type": "Round Neck"}, {"Sleeve": "Half Sleeve"}]
+        → {"type": "round neck", "sleeve": "half sleeve"}
         """
         if not self.product_details:
-        return []
+            return {}
 
-        result = []
-        for item in self.product_details:
-            if isinstance(item, dict):
-                for k, v in item.items():
-                    if k:
-                        result.append(self._normalize_category_field(str(k)))
-                    if v:
-                        result.append(self._normalize_category_field(str(v)))               
-        return result
+        processed = {}
 
-    def _combine_search_text(self) -> str:
+        for k, v in self.product_details.items():
+            norm_key = self._normalize_category_field(str(k)) if k else None
+            norm_value = self._normalize_category_field(str(v)) if v else None
+            if norm_key:
+                processed[norm_key] = norm_value
+
+        return processed
+
+    def _combine_search_text(self) -> List[str]:
         """Combine all relevant text fields into a single search text string."""
         parts = []
         if self.title_processed:
@@ -162,8 +163,11 @@ class ProcessedDocument(BaseModel):
         if self.sub_category_normalized:
             parts.append(self.sub_category_normalized)
         if self.product_details_processed:
-            parts += self.product_details_processed
+            parts += [v for v in self.product_details_processed.values() if v]
         if self.seller_normalized:
             parts.append(self.seller_normalized)
 
-        return " ".join(parts).strip()
+        return self._preprocess_text(" ".join(parts).strip())
+
+    def __str__(self) -> str:
+        return self.model_dump_json(indent=2)

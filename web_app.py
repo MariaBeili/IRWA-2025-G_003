@@ -5,6 +5,8 @@ import httpagentparser  # for getting the user agent as json
 from flask import Flask, render_template, session
 from flask import request
 
+from project_progress.part_1.data_preparation import ProcessedDocument
+
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
 from myapp.search.objects import Document, StatsDocument
@@ -43,6 +45,11 @@ file_path = path + "/" + os.getenv("DATA_FILE_PATH")
 corpus = load_corpus(file_path)
 # Log first element of corpus to verify it loaded correctly:
 print("\nCorpus is loaded... \n First element:\n", list(corpus.values())[0])
+
+# Log first element of corpus onvert it into a ProcessedDocument
+processed_doc = ProcessedDocument.from_document(list(corpus.values())[0])
+processed_doc.process_fields()
+print("\nFirst processed element:\n", processed_doc)
 
 
 # Home URL "/"
