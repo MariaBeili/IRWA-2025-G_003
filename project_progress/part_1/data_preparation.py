@@ -6,16 +6,15 @@ from nltk.tokenize import word_tokenize
 from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
 import re
-import unicodedata
 
 from myapp.search.objects import Document
 
 
 class ProcessedDocument(BaseModel):
+
+    # Original
     _id: str
     pid: str
-
-    # Original (for display/filter)
     title: str
     description: Optional[str]
     brand: Optional[str]
@@ -30,14 +29,16 @@ class ProcessedDocument(BaseModel):
     average_rating: Optional[float]
     url: Optional[str]
 
-    # Preprocessed
+    # Processed
     title_processed: Optional[List[str]] = None
     description_processed: Optional[List[str]] = None
-    brand_normalized: Optional[str] = None
-    category_normalized: Optional[str] = None
-    sub_category_normalized: Optional[Dict[str, Any]] = None
-    product_details_processed: Optional[List[str]] = None
-    seller_normalized: Optional[str] = None
+    brand_processed: Optional[List[str]] = None
+    category_processed: Optional[List[str]] = None
+    sub_category_processed: Optional[List[str]] = None
+    seller_processed: Optional[List[str]] = None
+
+    product_details_processed: Optional[Dict[str, Any]] = None
+
     search_text: Optional[List[str]] = None
 
     # --- CLASS METHODS ---
@@ -49,7 +50,7 @@ class ProcessedDocument(BaseModel):
         It copies fields first, and you can later call process_fields().
         """
         return cls(
-            _id=getattr(doc, "_id", None),
+            _id=getattr(doc, "_id", None), # For some reason we don't get _id in Document correctly when loading the data
             pid=doc.pid,
             title=doc.title,
             description=doc.description,
@@ -68,16 +69,15 @@ class ProcessedDocument(BaseModel):
 
     def process_fields(self):
         """
-        Preprocess all relevant fields for indexing.
+        Process all relevant fields for indexing.
         This calls smaller helper methods for modularity.
         """
-        self.title_processed = self._preprocess_text(self.title)
-        self.description_processed = self._preprocess_text(self.description)
-
-        self.brand_normalized = self._normalize_category_field(self.brand)
-        self.category_normalized = self._normalize_category_field(self.category)
-        self.sub_category_normalized = self._normalize_category_field(self.sub_category)
-        self.seller_normalized = self._normalize_category_field(self.seller)
+        self.title_processed = self._process_text(self.title)
+        self.description_processed = self._process_text(self.description)
+        self.brand_processed = self._process_text(self.brand)
+        self.category_processed = self._process_text(self.category)
+        self.sub_category_processed = self._process_text(self.sub_category)
+        self.seller_processed = self._process_text(self.seller)
 
         self.product_details_processed = self._process_product_details()
 
@@ -85,13 +85,12 @@ class ProcessedDocument(BaseModel):
 
     # --- HELPER METHODS ---
 
-    def _preprocess_text(self, text: Optional[str]) -> List[str]:
-        """Tokenize, lowercase, remove stopwords/punctuation, and stem text."""
+    def _process_text(self, text: Optional[str]) -> List[str]:
+        """
+        Tokenize, lowercase, remove stopwords/punctuation, and stem text.
+        """
         if not text:
             return []
-
-        # Normalize accents
-        text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode("utf-8", "ignore")
 
         # Lowercase
         text = text.lower()
@@ -113,8 +112,6 @@ class ProcessedDocument(BaseModel):
         except LookupError:
             nltk.download("stopwords", quiet=True)
             stop_words = set(stopwords.words("english"))
-            
-        tokens = [t for t in tokens if t not in stop_words and len(t) > 1]
 
         # Stemming
         stemmer = PorterStemmer()
@@ -122,32 +119,22 @@ class ProcessedDocument(BaseModel):
 
         return tokens
 
-    def _normalize_category_field(self, value: Optional[str]) -> Optional[str]:
-        """Simple normalization for categorical/keyword fields."""
-        if not value:
-            return None
-        value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("utf-8", "ignore")
-        return value.strip().lower()
-
-    def _process_product_details(self) -> Dict[str, Optional[str]]:
+    def _process_product_details(self) -> Dict[str, Any]:
         """
-        Process product_details into a dictionary of normalized key-value pairs.
-        Example:
-        [{"Type": "Round Neck"}, {"Sleeve": "Half Sleeve"}]
-        → {"type": "round neck", "sleeve": "half sleeve"}
+        Process product_details into a dictionary of processed key values.
+        Keys are not processed.
         """
         if not self.product_details:
             return {}
 
-        processed = {}
+        processed_dict = {}
 
         for k, v in self.product_details.items():
-            norm_key = self._normalize_category_field(str(k)) if k else None
-            norm_value = self._normalize_category_field(str(v)) if v else None
-            if norm_key:
-                processed[norm_key] = norm_value
+            processed_value = self._process_text(str(v)) if v else None
+            if k:
+                processed_dict[k] = processed_value
 
-        return processed
+        return processed_dict
 
     def _combine_search_text(self) -> List[str]:
         """Combine all relevant text fields into a single search text string."""
@@ -156,18 +143,19 @@ class ProcessedDocument(BaseModel):
             parts += self.title_processed
         if self.description_processed:
             parts += self.description_processed
-        if self.brand_normalized:
-            parts.append(self.brand_normalized)
-        if self.category_normalized:
-            parts.append(self.category_normalized)
-        if self.sub_category_normalized:
-            parts.append(self.sub_category_normalized)
+        if self.brand_processed:
+            parts += self.brand_processed
+        if self.category_processed:
+            parts += self.category_processed
+        if self.sub_category_processed:
+            parts += self.sub_category_processed
+        if self.seller_processed:
+            parts += self.seller_processed
         if self.product_details_processed:
-            parts += [v for v in self.product_details_processed.values() if v]
-        if self.seller_normalized:
-            parts.append(self.seller_normalized)
+            for v in self.product_details_processed.values():
+                parts += v
 
-        return self._preprocess_text(" ".join(parts).strip())
+        return parts
 
     def __str__(self) -> str:
         return self.model_dump_json(indent=2)
