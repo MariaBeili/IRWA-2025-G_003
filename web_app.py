@@ -1,11 +1,14 @@
 import os
 from json import JSONEncoder
 
+import time
+
 import httpagentparser  # for getting the user agent as json
 from flask import Flask, render_template, session
 from flask import request
 
 from project_progress.part_1.data_preparation import ProcessedDocument
+from project_progress.part_2.indexing import create_index_tfidf, search_tfidf
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
@@ -50,6 +53,57 @@ print("\nCorpus is loaded... \n First element:\n", list(corpus.values())[0])
 processed_doc = ProcessedDocument.from_document(list(corpus.values())[0])
 processed_doc.process_fields()
 print("\nFirst processed element:\n", processed_doc)
+
+# Example documents
+print("Processing documents...")
+start_time = time.time()
+
+processed_corpus = [None] * len(corpus)
+
+for i in range(len(corpus)):
+    processed_corpus[i] = ProcessedDocument.from_document(list(corpus.values())[i])
+    processed_corpus[i].process_fields()
+
+process_time = time.time() - start_time
+print(f"Documents processed in {process_time:.4f} seconds.\n")
+
+
+# Time the index creation
+print("Building inverted index and computing TF-IDF...")
+start_time = time.time()
+
+index, tf, df, idf, title_index = create_index_tfidf(processed_corpus)
+
+index_time = time.time() - start_time
+print(f"Index built in {index_time:.4f} seconds.\n")
+
+
+# Define queries
+query1 = "Yorker cotton track pants for men"
+query2 = "Multicolor track pants combo York"
+query3 = "Black solid women track pants"
+query4 = "Elastic waist cotton blend track pants"
+query5 = "Self design multicolor track pants"
+
+queries = [query1, query2, query3, query4, query5]
+
+
+# Run and time searches
+for i, query in enumerate(queries, start=1):
+    print(f"\nQuery {i}: {query}")
+    start_time = time.time()
+    ranked_docs = search_tfidf(query, index, tf, idf)
+    search_time = time.time() - start_time
+    print(f"Search completed in {search_time:.4f} seconds.")
+
+    if not ranked_docs:
+        print("No matching documents found.")
+    else:
+        print("Ranked results:")
+        for rank, doc_id in enumerate(ranked_docs, start=1):
+            title = title_index.get(doc_id, "Unknown Title")
+            print(f"{rank}. {title} (doc_pid={doc_id})")
+
 
 
 # Home URL "/"
@@ -166,4 +220,4 @@ def plot_number_of_views():
 
 
 if __name__ == "__main__":
-    app.run(port=8088, host="0.0.0.0", threaded=False, debug=os.getenv("DEBUG"))
+    app.run(port=8088, host="0.0.0.0", threaded=False, debug=os.getenv("DEBUG"), use_reloader=False)
