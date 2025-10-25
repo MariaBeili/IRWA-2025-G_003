@@ -106,12 +106,15 @@ class ProcessedDocument(BaseModel):
             nltk.download("punkt_tab", quiet=True)
             tokens = word_tokenize(text)
 
-        # Remove stopwords
+        # Loading stopwords
         try:
             stop_words = set(stopwords.words("english"))
         except LookupError:
             nltk.download("stopwords", quiet=True)
             stop_words = set(stopwords.words("english"))
+
+        # Remove stopwords
+        tokens = [t for t in tokens if t not in stop_words]
 
         # Stemming
         stemmer = PorterStemmer()
