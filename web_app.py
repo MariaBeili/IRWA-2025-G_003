@@ -79,8 +79,8 @@ print(f"Index built in {index_time:.4f} seconds.\n")
 
 
 # Define queries
-query1 = "Yorker cotton track pants for men"
-query2 = "Multicolor track pants combo York"
+query1 = "ARBO cotton track pants for men"
+query2 = "Multicolor track pants combo ECKO"
 query3 = "Black solid women track pants"
 query4 = "Elastic waist cotton blend track pants"
 query5 = "Self design multicolor track pants"
