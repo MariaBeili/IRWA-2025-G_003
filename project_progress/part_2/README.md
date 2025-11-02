@@ -29,8 +29,7 @@ This part of the project focuses on building the actual search engine and checki
 | **`query_preparation.ipynb`** | Cleans and processes queries (tokenization, stopwords, stemming). |
 | **`irwa_index.pkl`** | Saved index file. (too big to upload to github) |
 | **`search_results.txt`** | File that shows the top results for custom queries. |
-| **`my_queries_validation_labels`** | This file contains the *manual ground truth* for 5 custom queries.  
-  We created it after manually checking the top retrieved results and assigning binary labels (1 = relevant, 0 = not relevant). |
+| **`my_queries_validation_labels`** | This file contains the *manual ground truth* for 5 custom queries. We created it after manually checking the top retrieved results and assigning binary labels (1 = relevant, 0 = not relevant). |
 
 ---
 
@@ -66,5 +65,6 @@ This part is for own queries. We created a new ground truth file called data/my_
 python project_progress/part_2/my_query_evaluation.py
 ```
 Output: It prints the metrics for all 5 queries, and also the overall MAP and MRR at the end.
+
 
 
