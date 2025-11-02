@@ -46,3 +46,21 @@ You only need to do this once.
 
 ```bash
 python project_progress/part_2/run_search.py
+```
+Outputs:
+* project_progress/part_2/irwa_index.pkl → the saved index
+* project_progress/part_2/search_results.txt → results for my 5 test queries
+
+### Step 2: Run Evaluation 1 (Provided Queries)
+This part checks the system with the two predefined queries that come in the professor’s file data/validation_labels.csv.
+```bash
+python project_progress/part_2/evaluation_query.py
+```
+Output: It prints a table with the metrics (P@K, R@K, F1@K, AP@K, MAP, MRR, NDCG) for both queries.
+
+### Step 3: Run Evaluation 2 (My Custom Queries)
+This part is for my own queries. I created a new ground truth file called data/my_queries_validation_labels.csv, and I used it to evaluate 5 queries that I chose myself.
+```bash
+python project_progress/part_2/my_query_evaluation.py
+```
+Output: It prints the metrics for all 5 queries, and also the overall MAP and MRR at the end.
