@@ -1,0 +1,41 @@
+
+[Search] Query: 'ARBO cotton track pants for men'
+  Processed query: ['arbo', 'cotton', 'track', 'pant', 'men']
+  Found 6 results in 0.0481 seconds
+    1. (PID: TKPFY2YCGHSUHJ8K) Solid Men Black Track Pants
+    2. (PID: TKPFZKAFKMHANEDG) Solid Men Maroon Track Pants
+    3. (PID: TKPFNWG6GVFNXUVG) Solid Men Black Track Pants
+    4. (PID: TKPFNWG6UTARYEDS) Solid Men Dark Blue Track Pants
+    5. (PID: TKPFWFWBTMZYGHFG) Solid Men Grey Track Pants
+
+[Search] Query: 'Multicolor track pants combo ECKO'
+  Processed query: ['multicolor', 'track', 'pant', 'combo', 'ecko']
+  Found 0 results in 0.0089 seconds
+    No results found.
+
+[Search] Query: 'Black solid women track pants'
+  Processed query: ['black', 'solid', 'women', 'track', 'pant']
+  Found 218 results in 0.0233 seconds
+    1. (PID: TKPF3FPMC6PGGGYH) Solid Women Black, Grey Track Pants
+    2. (PID: TKPFWGWBQY8UZZUB) Solid Women Black Track Pants
+    3. (PID: TKPFRR83W2WEQGV3) Solid Women Black Track Pants
+    4. (PID: TKPFGGWJMDQFKZ5Y) Solid Women Black Track Pants
+    5. (PID: TKPFXNPJTHFD5YEY) Solid Women Black Track Pants
+
+[Search] Query: 'Elastic waist cotton blend track pants'
+  Processed query: ['elast', 'waist', 'cotton', 'blend', 'track', 'pant']
+  Found 87 results in 0.0312 seconds
+    1. (PID: TKPFUG3GUGQJDZRC) Solid Women Grey Track Pants
+    2. (PID: TKPFUG35ZPGD2ZYB) Solid Women Black Track Pants
+    3. (PID: TKPFUFUK3MDSRFRE) Solid Men Blue Track Pants
+    4. (PID: TKPFUG3FVYDZXHRE) Solid Women Grey Track Pants
+    5. (PID: TKPFUF3VTZ5CUS2Y) Solid Men Black Track Pants
+
+[Search] Query: 'Self design multicolor track pants'
+  Processed query: ['self', 'design', 'multicolor', 'track', 'pant']
+  Found 8 results in 0.0105 seconds
+    1. (PID: TKPFZ845YKNZ2VGV) Self Design Men Multicolor Track Pants
+    2. (PID: TKPFZ845SRYUJNUZ) Self Design Men Multicolor Track Pants
+    3. (PID: TKPFZ4YTX94CY9JX) Self Design Men Multicolor Track Pants
+    4. (PID: TKPFZ4YTRF3ZRTTH) Self Design Men Multicolor Track Pants
+    5. (PID: TKPFZ4YTJZWBFYFZ) Self Design Women Multicolor Track Pants
