@@ -27,7 +27,7 @@ This part of the project focuses on building the actual search engine and checki
 | **`indexing.py`** | Contains the functions to create and search the TF-IDF index. |
 | **`evaluation.py`** | Contains all metric functions (P@K, MAP, NDCG, etc.). |
 | **`query_preparation.py`** | Cleans and processes queries (tokenization, stopwords, stemming). |
-| **`irwa_index.pkl`** | Saved index file. |
+| **`irwa_index.pkl`** | Saved index file. (too big to upload to github) |
 | **`search_results.txt`** | File that shows the top results for my custom queries. |
 
 ---
@@ -64,3 +64,4 @@ This part is for my own queries. I created a new ground truth file called data/m
 python project_progress/part_2/my_query_evaluation.py
 ```
 Output: It prints the metrics for all 5 queries, and also the overall MAP and MRR at the end.
+
