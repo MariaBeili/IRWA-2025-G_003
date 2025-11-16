@@ -1,0 +1,223 @@
+import os
+import sys
+import math
+import pickle
+from collections import defaultdict
+
+# We make sure to import from Part 2
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from project_progress.part_2.query_preparation import process_query
+
+
+# We load the index created in Part 2
+INDEX_PATH = "project_progress/part_2/irwa_index.pkl"
+
+def load_index():
+    with open(INDEX_PATH, "rb") as f:
+        data = pickle.load(f)
+    return data["index"], data["tf"], data["idf"], data["title_index"]
+
+
+# TF-IDF + COSINE SIMILARITY
+def cosine_similarity(q_vec, d_vec):
+    dot = 0.0
+    for t in q_vec:
+        dot += q_vec[t] * d_vec.get(t, 0.0)
+
+    norm_q = math.sqrt(sum(v * v for v in q_vec.values()))
+    norm_d = math.sqrt(sum(v * v for v in d_vec.values()))
+
+    if norm_q == 0 or norm_d == 0:
+        return 0.0
+    return dot / (norm_q * norm_d)
+
+
+def rank_tfidf_cosine(query_terms, index, tf, idf):
+    # AND semantics
+    candidate_docs = None
+    # We find the intersection of documents containing all query terms
+    for t in query_terms:
+        if t not in index:
+            return []
+        postings = set(pid for pid, _ in index[t])
+        candidate_docs = postings if candidate_docs is None else candidate_docs.intersection(postings)
+    # If no documents contain all terms, return empty list
+    if not candidate_docs:
+        return []
+
+    # Query vector: TF = 1 for each term
+    q_vec = {t: idf.get(t, 0.0) for t in query_terms}
+
+    results = []
+
+    # For each candidate document, calculate the tf-idf vector as in Part 2
+    for pid in candidate_docs:
+        d_vec = {}
+
+        for term in query_terms:
+            if term not in index:
+                continue
+
+            # Find the POSITION of the document within index[term]
+            doc_index = None
+            for i, (doc_id, _) in enumerate(index[term]):
+                if doc_id == pid:
+                    doc_index = i
+                    break
+
+            if doc_index is None:
+                continue
+
+            term_tf = tf[term][doc_index]  # same format as used in Part 2
+            term_idf = idf.get(term, 0.0)
+
+            d_vec[term] = float(term_tf) * float(term_idf)
+
+        score = cosine_similarity(q_vec, d_vec)
+        results.append((pid, score))
+
+    results.sort(key=lambda x: x[1], reverse=True)
+    return results
+
+
+# BM25 RANKING
+# BM25 parameters
+k1 = 1.5
+b = 0.75
+
+def compute_doc_len(pid, index):
+    """Document length = total number of occurrences."""
+    total = 0
+    for term in index:
+        for doc_id, positions in index[term]:
+            if doc_id == pid:
+                total += len(positions)
+    return total
+
+
+def compute_avg_doc_len(index):
+    """Global average document length."""
+    lengths = []
+    seen = set()
+
+    for term in index:
+        for pid, positions in index[term]:
+            if pid not in seen:
+                seen.add(pid)
+                lengths.append(len(positions))
+
+    if not lengths:
+        return 1.0
+    return sum(lengths) / len(lengths)
+
+
+def bm25_score(pid, query_terms, index, idf, avg_len):
+    dl = compute_doc_len(pid, index)
+    score = 0.0
+    # For each term in the query, compute its BM25 contribution to the document score
+    for term in query_terms:
+        if term not in index:
+            continue
+
+        freq = 0
+        for doc_id, positions in index[term]:
+            if doc_id == pid:
+                freq = len(positions)
+                break
+        # Skip if term does not appear in document
+        if freq == 0:
+            continue
+
+        idf_term = idf.get(term, 0.0)
+
+        numerator = freq * (k1 + 1)
+        denominator = freq + k1 * (1 - b + b * (dl / avg_len))
+        # BM25 formula
+        score += idf_term * (numerator / denominator)
+
+    return score
+
+# Rank documents using BM25
+def rank_bm25(query_terms, index, idf):
+    candidate_docs = None
+    # We find the intersection of documents containing all query terms
+    for t in query_terms:
+        if t not in index:
+            return []
+        postings = set(pid for pid, _ in index[t])
+        candidate_docs = postings if candidate_docs is None else candidate_docs.intersection(postings)
+    # If no documents contain all terms, return empty list
+    if not candidate_docs:
+        return []
+    # Compute average document length
+    avg_len = compute_avg_doc_len(index)
+    results = []
+    # For each candidate document, compute BM25 score
+    for pid in candidate_docs:
+        score = bm25_score(pid, query_terms, index, idf, avg_len)
+        results.append((pid, score))
+
+    results.sort(key=lambda x: x[1], reverse=True)
+    return results
+
+# Main 
+QUERIES = [
+    "ARBO cotton track pants for men",
+    "Multicolor track pants combo ECKO",
+    "Black solid women track pants",
+    "Elastic waist cotton blend track pants",
+    "Self design multicolor track pants"
+]
+
+OUTPUT_FILE = "project_progress/part_3/ranking_results.txt"
+
+
+def main():
+    index, tf, idf, title_index = load_index()
+
+    os.makedirs("project_progress/part_3", exist_ok=True)
+    f = open(OUTPUT_FILE, "w", encoding="utf-8")
+
+    print("\nRANKING RESULTS (TF-IDF + COSINE & BM25)\n")
+    f.write("RANKING RESULTS (TF-IDF + COSINE & BM25)\n\n")
+
+    for query in QUERIES:
+        processed = process_query(query)
+
+        print(f"\nQuery: {query}")
+        print(f"Processed: {processed}")
+        f.write(f"\nQuery: {query}\n")
+        f.write(f"Processed: {processed}\n")
+
+        # TF-IDF + Cosine
+        tfidf_results = rank_tfidf_cosine(processed, index, tf, idf)
+
+        print("\nTop 5 (TF-IDF + Cosine):")
+        f.write("\nTop 5 (TF-IDF + Cosine):\n")
+
+        for pid, score in tfidf_results[:5]:
+            title = title_index.get(pid, "Unknown Title")
+            print(f"  {pid} | {score:.4f} | {title}")
+            f.write(f"  {pid} | {score:.4f} | {title}\n")
+
+        # BM25
+        bm25_results = rank_bm25(processed, index, idf)
+
+        print("\nTop 5 (BM25):")
+        f.write("\nTop 5 (BM25):\n")
+
+        for pid, score in bm25_results[:5]:
+            title = title_index.get(pid, "Unknown Title")
+            print(f"  {pid} | {score:.4f} | {title}")
+            f.write(f"  {pid} | {score:.4f} | {title}\n")
+
+        print("-" * 60)
+        f.write("-" * 60 + "\n")
+
+    f.close()
+    print(f"\nResults saved to: {OUTPUT_FILE}")
+
+
+if __name__ == "__main__":
+    main()
