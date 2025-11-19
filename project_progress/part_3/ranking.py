@@ -2,10 +2,29 @@ import os
 import sys
 import math
 import pickle
-from collections import defaultdict
+from json import JSONEncoder
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from myapp.search.load_corpus import load_corpus
+from dotenv import load_dotenv
+load_dotenv()  # take environment variables from .env
+
+
+# *** for using method to_json in objects ***
+def _default(self, obj):
+    return getattr(obj.__class__, "to_json", _default.default)(obj)
+_default.default = JSONEncoder().default
+JSONEncoder.default = _default
+# end lines ***for using method to_json in objects ***
+
+# load documents corpus into memory.
+full_path = os.path.realpath(__file__)
+path, filename = os.path.split(full_path)
+file_path = path + "/../../" + os.getenv("DATA_FILE_PATH")
+corpus = load_corpus(file_path)
 
 # We make sure to import from Part 2
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from project_progress.part_2.query_preparation import process_query
 
@@ -161,6 +180,88 @@ def rank_bm25(query_terms, index, idf):
     results.sort(key=lambda x: x[1], reverse=True)
     return results
 
+
+
+# El de casa
+def cosine_numeric(query_score, query_price, doc_score, doc_price):
+    dot = query_score * doc_score + query_price * doc_price
+
+    norm_q = math.sqrt(query_score ** 2 + query_price ** 2)
+    norm_d = math.sqrt(doc_score ** 2 + doc_price ** 2)
+
+    if norm_q == 0 or norm_d == 0:
+        return 0.0
+
+    return dot / (norm_q * norm_d)
+
+
+def rank_custom_cosine(query_terms, index, tf, idf, corpus, query_score, query_price):
+    """
+    corpus = dict[pid] -> Document
+    query_score (float)
+    query_price (float)
+    """
+
+    # AND semantics same as your other functions
+    candidate_docs = None
+    for t in query_terms:
+        if t not in index:
+            return []
+        postings = set(pid for pid, _ in index[t])
+        candidate_docs = postings if candidate_docs is None else candidate_docs.intersection(postings)
+    if not candidate_docs:
+        return []
+
+    # Build query TF-IDF vector
+    q_vec = {t: idf.get(t, 0.0) for t in query_terms}
+
+    results = []
+
+    for pid in candidate_docs:
+
+        # Build document TF-IDF vector (same method as in TF-IDF ranker)
+        d_vec = {}
+        for term in query_terms:
+            if term not in index:
+                continue
+
+            # find doc in postings
+            doc_index = None
+            for i, (doc_id, _) in enumerate(index[term]):
+                if doc_id == pid:
+                    doc_index = i
+                    break
+
+            if doc_index is None:
+                continue
+
+            term_tf = tf[term][doc_index]
+            term_idf = idf.get(term, 0.0)
+            d_vec[term] = float(term_tf) * float(term_idf)
+
+        # TEXT COSINE
+        text_cos = cosine_similarity(q_vec, d_vec)
+
+        # NUMERIC COSINE based on Document metadata
+        doc = corpus[pid]
+
+        numeric_cos = cosine_numeric(
+            query_score,
+            query_price,
+            doc.average_rating or 0.0,
+            doc.selling_price or 0.0
+        )
+
+        # FINAL SCORE = 50/50
+        final_score = 0.5 * text_cos + 0.5 * numeric_cos
+
+        results.append((pid, final_score))
+
+    results.sort(key=lambda x: x[1], reverse=True)
+    return results
+
+
+
 # Main 
 QUERIES = [
     "ARBO cotton track pants for men",
@@ -168,6 +269,22 @@ QUERIES = [
     "Black solid women track pants",
     "Elastic waist cotton blend track pants",
     "Self design multicolor track pants"
+]
+
+PRICES = [
+    50.0,
+    30.0,
+    20.0,
+    15.0,
+    30.0
+]
+
+RATINGS = [
+    4.0,
+    3.0,
+    2.0,
+    4.0,
+    1.0
 ]
 
 OUTPUT_FILE = "project_progress/part_3/ranking_results.txt"
@@ -182,7 +299,7 @@ def main():
     print("\nRANKING RESULTS (TF-IDF + COSINE & BM25)\n")
     f.write("RANKING RESULTS (TF-IDF + COSINE & BM25)\n\n")
 
-    for query in QUERIES:
+    for query, price, rating in zip(QUERIES, PRICES, RATINGS):
         processed = process_query(query)
 
         print(f"\nQuery: {query}")
@@ -208,6 +325,17 @@ def main():
         f.write("\nTop 5 (BM25):\n")
 
         for pid, score in bm25_results[:5]:
+            title = title_index.get(pid, "Unknown Title")
+            print(f"  {pid} | {score:.4f} | {title}")
+            f.write(f"  {pid} | {score:.4f} | {title}\n")
+
+        # El de casa
+        custom_results = rank_custom_cosine(processed, index, tf, idf, corpus, rating, price)
+
+        print("\nTop 5 (custom):")
+        f.write("\nTop 5 (custom):\n")
+
+        for pid, score in custom_results[:5]:
             title = title_index.get(pid, "Unknown Title")
             print(f"  {pid} | {score:.4f} | {title}")
             f.write(f"  {pid} | {score:.4f} | {title}\n")

@@ -7,7 +7,7 @@ The goal of Part 3 is to experiemnt with different ranking approaches in a searc
 For this part, we implemented:
 1. TF-IDF + Cosine Similarity 
 2. BM25
-3. Our own Score Ranking: "POSAR QUIN"
+3. Our own Score Ranking: "50% TF-IDF + Cosine Similarity, 50% price-rating Cosine Similarity"
 4. Word2vec + cosine
 
 Then we tested these methos using the 5 queries, so we could compare how each methos chaneges the ranking order. 
