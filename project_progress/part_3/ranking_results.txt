@@ -24,6 +24,28 @@ Top 5 (custom):
   TKPFY2YCGHSUHJ8K | 0.9737 | Solid Men Black Track Pants
   TKPFNWG6GVFNXUVG | 0.9737 | Solid Men Black Track Pants
   TKPFNWG6UTARYEDS | 0.9736 | Solid Men Dark Blue Track Pants
+
+Top 20 word2vec + cosine:
+TKPFK52CRCHV9HQ7 | 0.8194 | Solid Men Multicolor Track Pants
+TKPFK52BJSBGNNKK | 0.8194 | Solid Men Multicolor Track Pants
+TKPFK52C7YUQAABT | 0.8148 | Solid Women Multicolor Track Pants
+TKPFK52BUCF4VAFH | 0.8148 | Solid Women Multicolor Track Pants
+TKPFK52CWMPSATRM | 0.8148 | Solid Women Multicolor Track Pants
+TKPFK52BFGTB7JFN | 0.8148 | Solid Women Multicolor Track Pants
+TKPEJXS2VMGHCGGD | 0.8130 | Solid Men Denim Grey Track Pants
+TKPFZG64NDH5W4UY | 0.8106 | Striped Men Grey Track Pants
+TKPFWBGPGVKVZARU | 0.8096 | Striped Women Grey Track Pants
+TKPFC7B9HBZTWVFV | 0.8031 | Solid Women Black Track Pants
+SOCECSXJNMKZHH8K | 0.7986 | Men Solid Mid-Calf/Crew
+TKPEYQ6YWVFUWRJH | 0.7979 | Printed Men Grey Track Pants
+TKPFPEYVAAZHVZN9 | 0.7979 | Printed Men Grey Track Pants
+TKPFW6455HJV2JVH | 0.7968 | Solid Men Maroon Track Pants
+TKPFZAQ38HGW9FJQ | 0.7930 | Checkered Men Grey Track Pants
+TROFN8YNBWZKQXST | 0.7911 | Tapered Men Green Cotton Blend Trousers
+TKPFVEV49BGFYQRD | 0.7904 | Printed Men Black Track Pants
+TKPFNEXV449KGJHM | 0.7904 | Printed Men Black Track Pants
+TKPFHX4UGZCFBK2K | 0.7904 | Printed Men Black Track Pants
+TKPFRAHG2XHUCUXK | 0.7904 | Printed Men Black Track Pants
 ------------------------------------------------------------
 
 Query: Multicolor track pants combo ECKO
@@ -34,6 +56,28 @@ Top 5 (TF-IDF + Cosine):
 Top 5 (BM25):
 
 Top 5 (custom):
+
+Top 20 word2vec + cosine:
+TKPFZFSHHACG3FHC | 0.8120 | Solid Men Multicolor Track Pants
+TKPFZFSHQPDRGZTM | 0.8120 | Solid Men Multicolor Track Pants
+TKPFZFSH3F9ZA7C6 | 0.8120 | Solid Men Multicolor Track Pants
+TKPFP8KHHJGU9UFT | 0.8120 | Solid Men Multicolor Track Pants
+TKPFP8KHXSGEAKCE | 0.8120 | Solid Men Multicolor Track Pants
+TKPFP8KHJHGD94HK | 0.8120 | Solid Men Multicolor Track Pants
+TKPFP8KHXYVSWZ6U | 0.8120 | Solid Men Multicolor Track Pants
+TKPFK52CRCHV9HQ7 | 0.8118 | Solid Men Multicolor Track Pants
+TKPFK52BJSBGNNKK | 0.8118 | Solid Men Multicolor Track Pants
+TKPFWJDSJHYKH2R6 | 0.8088 | Camouflage Men Multicolor Track Pants
+TKPFK52C7YUQAABT | 0.8050 | Solid Women Multicolor Track Pants
+TKPFK52BUCF4VAFH | 0.8050 | Solid Women Multicolor Track Pants
+TKPFK52CWMPSATRM | 0.8050 | Solid Women Multicolor Track Pants
+TKPFK52BFGTB7JFN | 0.8050 | Solid Women Multicolor Track Pants
+TKPFVCTZQBW7TRWF | 0.8012 | Printed Men Multicolor Track Pants
+TKPFP7FERFT4ECH2 | 0.8009 | Camouflage Women Multicolor Track Pants
+TKPFUNPHBRCNGWM6 | 0.7957 | Solid Women Multicolor Track Pants
+TKPFUNP4CP5EXQCH | 0.7957 | Solid Women Multicolor Track Pants
+TKPFUNZQAWS52D2U | 0.7957 | Solid Women Multicolor Track Pants
+TKPFP8KHJKAFVDNT | 0.7957 | Solid Women Multicolor Track Pants
 ------------------------------------------------------------
 
 Query: Black solid women track pants
@@ -44,14 +88,14 @@ Top 5 (TF-IDF + Cosine):
   TKPFY9RYZEFYKMZJ | 1.0000 | Solid Women Black Track Pants
   TKPFZZ2E9ZBUJQN2 | 1.0000 | Solid Women Black, Blue Track Pants
   TKPFDT6GHGEYDTAS | 1.0000 | Solid Women Black Track Pants
-  TKPFDT6GD6PYND8X | 1.0000 | Solid Women Black Track Pants
+  TKPFGZYS9CWTRMZJ | 1.0000 | Solid Women Black Track Pants
 
 Top 5 (BM25):
   TKPFGGWJMDQFKZ5Y | 3.4009 | Solid Women Black Track Pants
   TKPFRR83W2WEQGV3 | 3.3330 | Solid Women Black Track Pants
-  TKPFZGQVUAJBZFDM | 3.2866 | Solid Women Black Track Pants
   TKPFZKW9TK4PXH6G | 3.2866 | Solid Women Black Track Pants
   TKPFWVHJ9F3RZCZF | 3.2866 | Solid Women Black Track Pants
+  TKPFZGQV8GZQZMYX | 3.2866 | Solid Women Black Track Pants
 
 Top 5 (custom):
   TKPFY9RYZEFYKMZJ | 0.9981 | Solid Women Black Track Pants
@@ -59,6 +103,28 @@ Top 5 (custom):
   TKPFV4MTHHV7VXAY | 0.9979 | Solid Women Black Track Pants
   TKPFZZ2E9ZBUJQN2 | 0.9978 | Solid Women Black, Blue Track Pants
   TKPFGZYS9CWTRMZJ | 0.9976 | Solid Women Black Track Pants
+
+Top 20 word2vec + cosine:
+TKPFGZYSCE255DSF | 1.0000 | Solid Women Black Track Pants
+TKPFVEV4E4GHP9ZU | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JRSRHFYZA8 | 1.0000 | Solid Women Black Track Pants
+TKPFVEV4VXZ2FZC3 | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JRGY3NABV3 | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JR6HKJRZUY | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JRA9E9ZVW8 | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JRU3ASNZN7 | 1.0000 | Solid Women Black Track Pants
+TKPFVEV4BNJQQ8GT | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JR5UKW2ZSD | 1.0000 | Solid Women Black Track Pants
+TKPFZ3JR45VKZR2E | 1.0000 | Solid Women Black Track Pants
+TKPFVEV4ZPTRRYE7 | 1.0000 | Solid Women Black Track Pants
+TKPFVEV4TAHCWHTG | 1.0000 | Solid Women Black Track Pants
+TKPF3MJ45ZC82FMZ | 1.0000 | Solid Women Black Track Pants
+TKPFYERJQHGHSQFM | 1.0000 | Solid Women Black Track Pants
+TKPFRDMYZQGEFPXV | 1.0000 | Solid Women Black Track Pants
+TKPFY9RYZEFYKMZJ | 1.0000 | Solid Women Black Track Pants
+TKPFXNPJTHFD5YEY | 1.0000 | Solid Women Black Track Pants
+TKPFXS5ZEYHHHCHQ | 1.0000 | Solid Women Grey, Black Track Pants
+TKPFXS5ZMNWGZGGF | 1.0000 | Solid Women Green, Black Track Pants
 ------------------------------------------------------------
 
 Query: Elastic waist cotton blend track pants
@@ -67,9 +133,9 @@ Processed: ['elast', 'waist', 'cotton', 'blend', 'track', 'pant']
 Top 5 (TF-IDF + Cosine):
   TKPFC8JYEVY5JWWJ | 1.0000 | Solid Women Brown, Blue Track Pants
   TKPF7BXYJYE6EYKJ | 0.9985 | Solid Men Brown Track Pants
-  TKPF7BXYEDZAYEQQ | 0.9985 | Solid Women Blue Track Pants
-  TKPF7BXY5SUPBGTX | 0.9985 | Printed Women Grey Track Pants
   TKPF7BXYWRKGAYGM | 0.9985 | Solid Men Brown Track Pants
+  TKPF7BXY5SUPBGTX | 0.9985 | Printed Women Grey Track Pants
+  TKPF7BXYUFWF4JJT | 0.9985 | Solid Men Beige Track Pants
 
 Top 5 (BM25):
   TKPFUG3GUGQJDZRC | 2.0441 | Solid Women Grey Track Pants
@@ -84,6 +150,28 @@ Top 5 (custom):
   TKPF7BXYVYGXYHAD | 0.9830 | Solid Women White Track Pants
   TKPF7BXYYXUKBRYZ | 0.9830 | Camouflage Women Beige Track Pants
   TKPF7BXYDG3DXQ9F | 0.9830 | Printed Men Brown Track Pants
+
+Top 20 word2vec + cosine:
+TROFTQUTRWCQVFJR | 0.7790 | Tapered Women Grey Cotton Lycra Blend Trousers
+TROECJ9T4FHKB2DF | 0.7773 | Regular Fit Men Brown Cotton Blend Trousers
+TROECJ9TTHBFUFYQ | 0.7747 | Regular Fit Men Grey Cotton Blend Trousers
+TROECJ9TXFHF5WSY | 0.7744 | Regular Fit Women Brown Cotton Blend Trousers
+TKPFW6455HJV2JVH | 0.7733 | Solid Men Maroon Track Pants
+TROF5R7XZS8ZNPEJ | 0.7710 | Slim Fit Men Yellow Cotton Lycra Blend Trousers
+TROF3KYFEGEHXG82 | 0.7706 | Regular Fit Men Black Cotton Lycra Blend Trousers
+TROF3KYFZWCWH5HZ | 0.7706 | Regular Fit Men Black Cotton Lycra Blend Trousers
+TKPFDHDHGWXCFXPC | 0.7705 | Solid Men Multicolor Track Pants
+TROF5ZFFBHKJFTXZ | 0.7705 | Slim Fit Men White Cotton Lycra Blend Trousers
+TKPFDHDH74PZGMWT | 0.7686 | Solid Women Black Track Pants
+TKPFDHDGEYWM99XG | 0.7669 | Solid Women Multicolor Track Pants
+TROF3KYFG625YNKV | 0.7668 | Regular Fit Women Black Cotton Lycra Blend Trousers
+TROF3KYFNTVWK6CK | 0.7668 | Regular Fit Women Black Cotton Lycra Blend Trousers
+TROF4HUX9HMJRH2H | 0.7659 | Slim Fit Men Black Cotton Lycra Blend Trousers
+SWSFN8YZ33MHKQVF | 0.7655 | Full Sleeve Solid Women Sweatshirt
+SWSFN8YZXFSUCAJX | 0.7655 | Full Sleeve Solid Women Sweatshirt
+SWSFN8YZZAN8RBDC | 0.7655 | Full Sleeve Solid Women Sweatshirt
+SWSFN8YZW4VPXW7W | 0.7655 | Full Sleeve Solid Women Sweatshirt
+TROFZTGZKANCZERB | 0.7655 | Slim Fit Men Orange Cotton Blend Trousers
 ------------------------------------------------------------
 
 Query: Self design multicolor track pants
@@ -92,16 +180,16 @@ Processed: ['self', 'design', 'multicolor', 'track', 'pant']
 Top 5 (TF-IDF + Cosine):
   TKPFZ845SRYUJNUZ | 1.0000 | Self Design Men Multicolor Track Pants
   TKPFZ845YKNZ2VGV | 1.0000 | Self Design Men Multicolor Track Pants
+  TKPFZ4YT7ZNYXG27 | 0.9689 | Self Design Men Multicolor Track Pants
   TKPFZ4YTJZWBFYFZ | 0.9689 | Self Design Women Multicolor Track Pants
-  TKPFZ4YTRF3ZRTTH | 0.9689 | Self Design Men Multicolor Track Pants
-  TKPFZ4YTX94CY9JX | 0.9689 | Self Design Men Multicolor Track Pants
+  TKPFZ4YTGNZJDZDU | 0.9689 | Self Design Women Multicolor Track Pants
 
 Top 5 (BM25):
   TKPFZ845SRYUJNUZ | 3.9233 | Self Design Men Multicolor Track Pants
   TKPFZ845YKNZ2VGV | 3.9233 | Self Design Men Multicolor Track Pants
+  TKPFZ4YT7ZNYXG27 | 3.6471 | Self Design Men Multicolor Track Pants
   TKPFZ4YTJZWBFYFZ | 3.6471 | Self Design Women Multicolor Track Pants
-  TKPFZ4YTRF3ZRTTH | 3.6471 | Self Design Men Multicolor Track Pants
-  TKPFZ4YTX94CY9JX | 3.6471 | Self Design Men Multicolor Track Pants
+  TKPFZ4YTGNZJDZDU | 3.6471 | Self Design Women Multicolor Track Pants
 
 Top 5 (custom):
   TKPFZ845SRYUJNUZ | 0.9998 | Self Design Men Multicolor Track Pants
@@ -109,4 +197,26 @@ Top 5 (custom):
   TKPFZ4YTX94CY9JX | 0.9842 | Self Design Men Multicolor Track Pants
   TKPFZ4YTRF3ZRTTH | 0.9842 | Self Design Men Multicolor Track Pants
   TKPFZ4YTJZWBFYFZ | 0.9842 | Self Design Women Multicolor Track Pants
+
+Top 20 word2vec + cosine:
+TKPFZ4YTRF3ZRTTH | 0.9566 | Self Design Men Multicolor Track Pants
+TKPFZ4YT7ZNYXG27 | 0.9566 | Self Design Men Multicolor Track Pants
+TKPFZ4YTX94CY9JX | 0.9566 | Self Design Men Multicolor Track Pants
+TKPFZ845YKNZ2VGV | 0.9566 | Self Design Men Multicolor Track Pants
+TKPFZ845SRYUJNUZ | 0.9566 | Self Design Men Multicolor Track Pants
+TKPFZ4YTJZWBFYFZ | 0.9501 | Self Design Women Multicolor Track Pants
+TKPFZ4YTGNZJDZDU | 0.9501 | Self Design Women Multicolor Track Pants
+TKPFZAMVYFKHQFHZ | 0.8571 | Self Design Women Red Track Pants
+TKPF4D5RZT4E3W5V | 0.8558 | Self Design Men Blue Track Pants
+TKPFZ3JR3HQMHCWZ | 0.8485 | Self Design Men Grey Track Pants
+TKPFWBMXKAXKJD5B | 0.8485 | Self Design Men Grey Track Pants
+TKPFVZ84E7CGRTSN | 0.8485 | Self Design Men Grey Track Pants
+TKPFUVM3MPKYDVUH | 0.8485 | Self Design Men Grey Track Pants
+TKPFGPMJ7UFFM6HH | 0.8485 | Self Design Men Grey Track Pants
+TKPFZ3JRSCCTXFMG | 0.8459 | Self Design Women Grey Track Pants
+TKPFDT6GFG4J3RMZ | 0.8459 | Self Design Women Grey Track Pants
+TKPFRDJFDWY9BJRM | 0.8459 | Self Design Women Grey Track Pants
+TKPF9F4X6FHGHYVQ | 0.8459 | Self Design Women Grey Track Pants
+TKPFVEV4C5ZY3K8U | 0.8278 | Self Design Women Black Track Pants
+TKPFZ3JRA3ZXT5GK | 0.8278 | Self Design Women Black Track Pants
 ------------------------------------------------------------

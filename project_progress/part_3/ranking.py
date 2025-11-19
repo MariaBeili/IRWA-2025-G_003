@@ -10,6 +10,8 @@ from myapp.search.load_corpus import load_corpus
 from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env
 
+from gensim.models import KeyedVectors
+import numpy as np
 
 # *** for using method to_json in objects ***
 def _default(self, obj):
@@ -260,7 +262,28 @@ def rank_custom_cosine(query_terms, index, tf, idf, corpus, query_score, query_p
     results.sort(key=lambda x: x[1], reverse=True)
     return results
 
+def cosine_similarity_vec(q_vec, d_vec):
+    if q_vec is None or d_vec is None:
+        return 0.0
+    dot = np.dot(q_vec, d_vec)
+    norm_q = np.linalg.norm(q_vec)
+    norm_d = np.linalg.norm(d_vec)
+    if norm_q == 0 or norm_d == 0:
+        return 0.0
+    return dot / (norm_q * norm_d)
 
+def text_vector(text, model):
+    words = text.lower().split()
+    vectors = [model[w] for w in words if w in model]
+    if not vectors:
+        return None
+    return sum(vectors) / len(vectors)
+
+def rank_word2vec_cos(query_terms, doc_vectors, model):
+    q_vec = text_vector(query_terms, model)
+    scores = [(pid, cosine_similarity_vec(q_vec, d_vec)) for pid, d_vec in doc_vectors.items()]
+    scores.sort(key=lambda x: x[1], reverse=True)
+    return scores[:20]
 
 # Main 
 QUERIES = [
@@ -291,7 +314,16 @@ OUTPUT_FILE = "project_progress/part_3/ranking_results.txt"
 
 
 def main():
+
+    model = KeyedVectors.load_word2vec_format("resources/GoogleNews-vectors-negative300.bin", binary=True)
+
     index, tf, idf, title_index = load_index()
+
+    doc_vectors = {}
+    for pid, doc in corpus.items():
+        text_parts = [getattr(doc,'title',''), getattr(doc,'description','')]
+        text = ' '.join(filter(None,text_parts))
+        doc_vectors[pid] = text_vector(text, model)
 
     os.makedirs("project_progress/part_3", exist_ok=True)
     f = open(OUTPUT_FILE, "w", encoding="utf-8")
@@ -339,6 +371,17 @@ def main():
             title = title_index.get(pid, "Unknown Title")
             print(f"  {pid} | {score:.4f} | {title}")
             f.write(f"  {pid} | {score:.4f} | {title}\n")
+
+        # word2vec + cosine
+
+        word2vec_cosine_results = rank_word2vec_cos(query, doc_vectors, model)
+
+        print("\nTop 20 word2vec + cosine:")
+        f.write("\nTop 20 word2vec + cosine:\n")
+        for pid,score in word2vec_cosine_results:
+            title = title_index.get(pid,'Unknown Title')
+            print(f'{pid} | {score:.4f} | {title}')
+            f.write(f'{pid} | {score:.4f} | {title}\n')
 
         print("-" * 60)
         f.write("-" * 60 + "\n")
