@@ -1,5 +1,5 @@
 # Part 3: Ranking & Filtering 
-This part we focus on ranking methids, how we tested them with the queries from Part2, how to run the code and where all the outputs are stired.
+This part we focus on ranking methods, how we tested them with the queries from Part2, how to run the code and where all the outputs are stired.
 
 ## What this part of the project does
 The goal of Part 3 is to experiemnt with different ranking approaches in a search engine. All queries follow *AND semantics*, so a document is only retrieved if ti contains all the query terms. 
@@ -35,4 +35,5 @@ python project_progress/part_3/ranking.py
 Outputs:
 * print the Top-5 results in the terminal,
 * save all results into ranking_results.txt.
+
 
