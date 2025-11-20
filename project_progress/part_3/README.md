@@ -28,6 +28,17 @@ and we reuse the index built in Part 2 `project_progress/part_2/irwa_index.pkl`
 
 
 ## How to run 
+
+### Install the gensim module
+First of all, you will have to run the following command to be able to read the word embeddings.
+```bash
+pip install gensim
+```
+
+### Download the word embeddings
+Then, download the word2vec model from this link and store it in the resources folder.
+https://www.kaggle.com/datasets/suraj520/googlenews-vectors-negative300bingz-gz-format?resource=download
+
 ### Run the ranking script
 ```bash
 python project_progress/part_3/ranking.py
