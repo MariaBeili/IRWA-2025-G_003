@@ -32,25 +32,77 @@
 
 
 ----
-## To download this repo locally
-
-Open a terminal console and execute:
+## Part 4: User Interface, RAG & Web Analytics
 ```
-cd <your preferred projects root directory>
-git clone https://github.com/trokhymovych/irwa-search-engine.git
+In this final part of the project, we transformed our backend search logic into a fully functional Web Application using Flask.
+We focused on three main goals:
+1. Usability: Creating a clean interface where users can search, filter by algorithm, and view product details.
+2. Intelligence: Integrating a RAG (Retrieval-Augmented Generation) system acting as a "Personal Shopper."
+3. Performance: Optimizing the application startup time.
 ```
+----
+### Implementation
+#### USER INTERFACE 
+```
+1. Optimized Web Application (web_app.py)
+We encountered a major efficiency problem in the provided template: it rebuilt the index from scratch every time the server started (taking ~3 minutes).
+The Fix: We modified the startup logic to load the pre-computed index (irwa_index.pkl) generated in Part 2.
+Result: The application now starts instantly (<1 second) and search results appear immediately.
 
-## Setting up the Python environment (only for the first time you run the project)
-### Install virtualenv
-Setting up a virtualenv is recommended to isolate the project dependencies from other Python projects on your machine.
-It allows you to manage packages on a per-project basis, avoiding potential conflicts between different projects.
+2. Multi-Algorithm Search
+We added a dropdown menu in the UI that allows the user to select the ranking algorithm dynamically:
+* TF-IDF: The baseline method.
+* BM25: Probabilistic ranking (usually better precision).
+* Word2Vec: Semantic search (finding context, not just keywords).
+* Custom: Our own score combining TF-IDF with Product Rating.
 
-In the project root directory execute:
+3. Analytics Dashboard
+We implemented a basic tracking system. We capture:
+* Search Queries: What users are typing.
+* Clicks: Which documents users actually view.
+* Dashboard: A visual representation of the most visited documents.
+````
+----
+----
+### File Structure
+```
+| File | Description |
+|------|--------------|
+| **`web_app.py`** | The main Flask server. Handles routing, loading the index, and calling search logic. |
+| **`myapp/search/search_engine.py `** | The logic layer. It imports our algorithms from Parts 2/3 and formats results for the UI. |
+| **`myapp/generation/rag.py`**| Improvemnets RAG. Contains the Prompt Template and connection to Groq API.|
+| **`templates/results.html`**| The results page. We designed "Product Cards" to display images, proces, and discount clearly.|
+| **`templates/doc_details.html`** | The product page. Display the full specification table (Seller, Fabric, Patteern). |
+```
+----
+### How to Run 
+####  Prerequisites 
+1. Ensure you have generated the index first (Part 2):
 ```bash
-pip3 install virtualenv
-virtualenv --version
+python project_progress/part_2/run_search.py
+```
+#### Execution
+Prrepare and activate virtualenv for the project and run the web server from the root directory:
+```bash
+python web_app.py
 ```
 
+The above will start a web server with the application:
+```
+ * Serving Flask app 'web-app' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on http://127.0.0.1:8088/ (Press CTRL+C to quit)
+```
+
+Open Web app in your Browser:  
+[http://127.0.0.1:8088/](http://127.0.0.1:8088/) or [http://localhost:8088/](http://localhost:8088/)
+
+
+
+----
 ### Prepare virtualenv for the project
 In the root of the project folder run to create a virtualenv named `irwa_venv`:
 ```bash
