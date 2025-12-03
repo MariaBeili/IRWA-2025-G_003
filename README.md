@@ -33,17 +33,15 @@
 
 ----
 ## Part 4: User Interface, RAG & Web Analytics
-```
 In this final part of the project, we transformed our backend search logic into a fully functional Web Application using Flask.
 We focused on three main goals:
 1. Usability: Creating a clean interface where users can search, filter by algorithm, and view product details.
 2. Intelligence: Integrating a RAG (Retrieval-Augmented Generation) system acting as a "Personal Shopper."
 3. Performance: Optimizing the application startup time.
-```
+
 ----
 ### Implementation
 #### USER INTERFACE 
-```
 1. Optimized Web Application (web_app.py)
 We encountered a major efficiency problem in the provided template: it rebuilt the index from scratch every time the server started (taking ~3 minutes).
 The Fix: We modified the startup logic to load the pre-computed index (irwa_index.pkl) generated in Part 2.
@@ -61,7 +59,7 @@ We implemented a basic tracking system. We capture:
 * Search Queries: What users are typing.
 * Clicks: Which documents users actually view.
 * Dashboard: A visual representation of the most visited documents.
-````
+  
 ----
 ----
 ### File Structure
@@ -187,3 +185,4 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
