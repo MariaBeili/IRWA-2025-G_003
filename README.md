@@ -32,7 +32,7 @@
 
 
 ----
-## Part 4: User Interface, RAG & Web Analytics
+# Part 4: User Interface, RAG & Web Analytics
 In this final part of the project, we transformed our backend search logic into a fully functional Web Application using Flask.
 We focused on three main goals:
 1. Usability: Creating a clean interface where users can search, filter by algorithm, and view product details.
@@ -184,5 +184,6 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
 
 
