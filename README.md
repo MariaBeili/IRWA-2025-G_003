@@ -49,21 +49,20 @@ Result: The application now starts instantly (<1 second) and search results appe
 
 2. Multi-Algorithm Search
 We added a dropdown menu in the UI that allows the user to select the ranking algorithm dynamically:
-* TF-IDF: The baseline method.
-* BM25: Probabilistic ranking (usually better precision).
-* Word2Vec: Semantic search (finding context, not just keywords).
-* Custom: Our own score combining TF-IDF with Product Rating.
+  * TF-IDF: The baseline method.
+  * BM25: Probabilistic ranking (usually better precision).
+  * Word2Vec: Semantic search (finding context, not just keywords).
+  * Custom: Our own score combining TF-IDF with Product Rating.
 
 3. Analytics Dashboard
 We implemented a basic tracking system. We capture:
-* Search Queries: What users are typing.
-* Clicks: Which documents users actually view.
-* Dashboard: A visual representation of the most visited documents.
-  
+  * Search Queries: What users are typing.
+  * Clicks: Which documents users actually view.
+  * Dashboard: A visual representation of the most visited documents.
+    
 ----
 ----
 ### File Structure
-```
 | File | Description |
 |------|--------------|
 | **`web_app.py`** | The main Flask server. Handles routing, loading the index, and calling search logic. |
@@ -71,7 +70,7 @@ We implemented a basic tracking system. We capture:
 | **`myapp/generation/rag.py`**| Improvemnets RAG. Contains the Prompt Template and connection to Groq API.|
 | **`templates/results.html`**| The results page. We designed "Product Cards" to display images, proces, and discount clearly.|
 | **`templates/doc_details.html`** | The product page. Display the full specification table (Seller, Fabric, Patteern). |
-```
+
 ----
 ### How to Run 
 ####  Prerequisites 
@@ -185,4 +184,5 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
 
