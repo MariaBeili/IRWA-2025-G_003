@@ -108,7 +108,7 @@ for i, query in enumerate(queries, start=1):
 
 # Home URL "/"
 @app.route('/')
-def index():
+def home():
     print("starting home url /...")
 
     # flask server creates a session by persisting a cookie in the user's browser.
@@ -126,58 +126,65 @@ def index():
     return render_template('index.html', page_title="Welcome")
 
 
+# In web_app.py
+
 @app.route('/search', methods=['POST'])
 def search_form_post():
-    
     search_query = request.form['search-query']
+    analytics_data.save_query_terms(search_query)
 
-    session['last_search_query'] = search_query
+    # 1. Run Search
+    start_time = time.time()
+    # Call your search logic (Part 2/3)
+    ranked_pids = search_tfidf(search_query, index, tf, idf) 
+    end_time = time.time()
 
-    search_id = analytics_data.save_query_terms(search_query)
+    # 2. Get full objects
+    results = []
+    for pid in ranked_pids:
+        if pid in corpus:
+            results.append(corpus[pid])
 
-    results = search_engine.search(search_query, search_id, corpus)
+    # 3. Generate RAG (Requirement 6)
+    rag_response = rag_generator.generate_response(search_query, results, top_N=5)
 
-    # generate RAG response based on user query and retrieved results
-    rag_response = rag_generator.generate_response(search_query, results)
-    print("RAG response:", rag_response)
-
-    found_count = len(results)
-    session['last_found_count'] = found_count
-
-    print(session)
-
-    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count, rag_response=rag_response)
+    # 4. Render Template
+    return render_template(
+        'results.html',
+        results_list=results,
+        page_title="Search Results",
+        found_counter=len(results),
+        rag_response=rag_response,
+        search_time=f"{end_time - start_time:.4f}"
+    )
 
 
 @app.route('/doc_details', methods=['GET'])
 def doc_details():
     """
-    Show document details page
-    ### Replace with your custom logic ###
+    Requirement 7: Document Details Page
     """
+    clicked_doc_id = request.args.get("pid")
+    
+    # 1. Track the click (Analytics)
+    if clicked_doc_id:
+        if clicked_doc_id in analytics_data.fact_clicks:
+            analytics_data.fact_clicks[clicked_doc_id] += 1
+        else:
+            analytics_data.fact_clicks[clicked_doc_id] = 1
 
-    # getting request parameters:
-    # user = request.args.get('user')
-    print("doc details session: ")
-    print(session)
+    # 2. Retrieve the specific document
+    # 'corpus' is a dictionary where Key=PID, Value=Document OBJECT
+    doc = corpus.get(clicked_doc_id)
+    
+    if not doc:
+        return render_template('doc_details.html', doc=None, page_title="Not Found")
 
-    res = session["some_var"]
-    print("recovered var from session:", res)
+    # --- THE FIX IS HERE ---
+    # We use 'doc.title' (dot notation), NOT 'doc.get("title")'
+    print(f"Found document: {doc.title}") 
 
-    # get the query string parameters from request
-    clicked_doc_id = request.args["pid"]
-    print("click in id={}".format(clicked_doc_id))
-
-    # store data in statistics table 1
-    if clicked_doc_id in analytics_data.fact_clicks.keys():
-        analytics_data.fact_clicks[clicked_doc_id] += 1
-    else:
-        analytics_data.fact_clicks[clicked_doc_id] = 1
-
-    print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
-    print(analytics_data.fact_clicks)
-    return render_template('doc_details.html')
-
+    return render_template('doc_details.html', doc=doc, page_title=doc.title)
 
 @app.route('/stats', methods=['GET'])
 def stats():

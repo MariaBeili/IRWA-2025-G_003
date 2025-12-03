@@ -1,27 +1,75 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
+
 {% block content %}
-    Found <strong>{{ found_counter }}</strong> results...
-    <hr>
+<div class="container mt-4">
+    <div class="alert alert-light border">
+        Found <strong>{{ found_counter }}</strong> results for "<em>{{ request.form['search-query'] if request.form['search-query'] else 'your query' }}</em>"
+        <span class="float-end text-muted small">Search time: {{ search_time }}s</span>
+    </div>
+
     {% if rag_response %}
-        <div class="mb-4 p-3" style="border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
-            <h5>AI-Generated Summary:</h5>
-            <p>{{ rag_response }}</p>
+    <div class="card mb-4 border-info">
+        <div class="card-header bg-info text-white">
+            <strong> AI Shopping Assistant</strong>
         </div>
+        <div class="card-body bg-light">
+            <p class="card-text" style="white-space: pre-line;">{{ rag_response }}</p>
+        </div>
+    </div>
     {% endif %}
+
     <hr>
+
     {% for item in results_list %}
-        <div class="pb-3">
-            <div class="doc-title">
-                <a href="{{ item.url }}">{{ item.title }}...
-                </a>
+    <div class="card mb-3 shadow-sm hover-effect">
+        <div class="row g-0">
+            <div class="col-md-2 d-flex align-items-center justify-content-center p-2 bg-white">
+                {% if item.images and item.images|length > 0 %}
+                    <img src="{{ item.images[0] }}" class="img-fluid rounded-start" alt="{{ item.title }}" style="max-height: 120px; object-fit: contain;">
+                {% else %}
+                    <div class="text-muted small">No Image</div>
+                {% endif %}
             </div>
-            <div class="doc-desc">
-                {{ item.doc_date }} — {{ item.description }}
-            </div>
+            
+            <div class="col-md-10">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="/doc_details?pid={{ item.pid }}" class="text-decoration-none text-dark fw-bold">
+                            {{ item.title }}
+                        </a>
+                    </h5>
+                    
+                    <div class="mb-2">
+                        <span class="h5 text-success me-2">{{ item.selling_price }}</span>
+                        {% if item.actual_price %}
+                            <span class="text-muted text-decoration-line-through small me-2">{{ item.actual_price }}</span>
+                        {% endif %}
+                        {% if item.discount %}
+                            <span class="badge bg-danger">{{ item.discount }} OFF</span>
+                        {% endif %}
+                        
+                        <span class="ms-3 text-warning">
+                            {% if item.average_rating %}
+                                ★ {{ item.average_rating }}
+                            {% else %}
+                                <span class="text-muted small">No rating</span>
+                            {% endif %}
+                        </span>
+                    </div>
 
+                    <p class="card-text text-muted small mb-2">
+                        {{ item.description[:180] }}...
+                    </p>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/doc_details?pid={{ item.pid }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <a href="{{ item.url }}" target="_blank" class="small text-secondary">Visit Store <i class="bi bi-box-arrow-up-right"></i></a>
+                    </div>
+                </div>
+            </div>
         </div>
-
+    </div>
     {% endfor %}
+</div>
 {% endblock %}
-

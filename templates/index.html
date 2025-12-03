@@ -1,18 +1,25 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    <div class="centered">
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <form class="d-flex" method="POST" onSubmit='return validate();' action="/search">
-            <input class="form-control me-2" name="search-query" type="search" placeholder="Search" aria-label="Search"
-                   autofocus="autofocus">
-            <button class="btn btn-primary" type="submit" onclick='this.form.submit();'>Search</button>
-            <input name="upf-irwa-hidden" type="hidden" value="123">
-        </form>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-        <p>&nbsp;</p>
-    </div>
+<div class="container text-center mt-5">
+    <h2>IRWA Search Engine</h2>
+    <p class="text-muted">Search through our e-commerce catalog</p>
+
+    <form class="d-flex flex-column align-items-center mt-4" method="POST" action="/search">
+        <div class="input-group mb-3" style="width: 60%;">
+            <input class="form-control" name="search-query" type="search" placeholder="Search for products..." required>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+
+        <div class="mb-3">
+        <label for="ranking-method" class="form-label">Ranking method:</label>
+        <select id="ranking-method" name="ranking-method" class="form-select" style="width: 250px;">
+            <option value="tfidf">TF-IDF + Cosine</option>
+            <option value="bm25">BM25</option>
+            <option value="word2vec">Word2Vec + Cosine</option>
+            <option value="custom">Custom (TF-IDF + Rating Boost)</option>
+        </select>
+        </div>
+    </form>
+</div>
 {% endblock %}

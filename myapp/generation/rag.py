@@ -1,70 +1,74 @@
 import os
 from groq import Groq
 from dotenv import load_dotenv
-load_dotenv()  # take environment variables from .env
 
+load_dotenv()
 
 class RAGGenerator:
-
+    # IMPROVEMENT 1: Better Prompt Engineering with Persona and constraints
     PROMPT_TEMPLATE = """
-        You are an expert product advisor helping users choose the best option from retrieved e-commerce products.
-
-        ## Instructions:
-        1. Identify the single best product that matches the user's request.
-        2. Present the recommendation clearly in this format:
-        - Best Product: [Product PID] [Product Name]
-        - Why: [Explain in plain language why this product is the best fit, referring to specific attributes like price, features, quality, or fit to user’s needs.]
-        3. If there is another product that could also work, mention it briefly as an alternative.
-        4. If no product is a good fit, return ONLY this exact phrase:
-        "There are no good products that fit the request based on the retrieved results."
-
-        ## Retrieved Products:
-        {retrieved_results}
-
-        ## User Request:
-        {user_query}
-
-        ## Output Format:
-        - Best Product: ...
-        - Why: ...
-        - Alternative (optional): ...
+    You are an expert personal shopper assistant for a fashion e-commerce site.
+    
+    User Query: "{user_query}"
+    
+    Here are the top products found (Format: ID | Name | Price | Rating | Description):
+    {retrieved_results}
+    
+    INSTRUCTIONS:
+    1. Analyze the products above.
+    2. Recommend the best option based on the user's query.
+    3. Explain WHY it is the best choice (mention price, fabric, brand, or specific features).
+    4. If there is a good alternative (e.g., cheaper or different style), mention it.
+    5. Keep the tone helpful and professional.
+    6. If NO products match the query well, say exactly: "I couldn't find any products that perfectly match your request."
+    
+    Output your response in clear, concise paragraphs. Do not use Markdown formatting like **bold** or # Headers, just plain text is fine.
     """
 
-    def generate_response(self, user_query: str, retrieved_results: list, top_N: int = 20) -> dict:
+    def generate_response(self, user_query: str, retrieved_results: list, top_N: int = 5) -> str:
         """
-        Generate a response using the retrieved search results. 
-        Returns:
-            dict: Contains the generated suggestion and the quality evaluation.
+        Generates a summary/recommendation using an LLM.
         """
-        DEFAULT_ANSWER = "RAG is not available. Check your credentials (.env file) or account limits."
-        try:
-            client = Groq(
-                api_key=os.environ.get("GROQ_API_KEY"),
-            )
-            model_name = os.environ.get("GROQ_MODEL", "llama-3.1-8b-instant")
+        # IMPROVEMENT 3: Safety check for API key
+        api_key = os.environ.get("GROQ_API_KEY")
+        if not api_key:
+            return "RAG System Disabled: No API Key found."
 
-            # Format the retrieved results for the prompt
-            formatted_results = "\n".join(
-                [f"- PID: {res.pid}, Title: {res.title}" for res in retrieved_results[:top_N]]
-            )
+        try:
+            client = Groq(api_key=api_key)
+            model_name = os.environ.get("GROQ_MODEL", "llama3-8b-8192")
+
+            # IMPROVEMENT 2: Enriched Context (Sending specific metadata like Price/Rating)
+            # We limit to top_N (e.g., 5) to save tokens and focus on best results
+            context_list = []
+            for doc in retrieved_results[:top_N]:
+                # Handle dictionary or object access safely
+                pid = getattr(doc, 'pid', doc.get('pid', 'N/A'))
+                title = getattr(doc, 'title', doc.get('title', 'N/A'))
+                price = getattr(doc, 'selling_price', doc.get('selling_price', 'N/A'))
+                rating = getattr(doc, 'average_rating', doc.get('average_rating', 'N/A'))
+                desc = getattr(doc, 'description', doc.get('description', ''))[:150] # Truncate desc
+                
+                context_list.append(f"{pid} | {title} | {price} | {rating} | {desc}...")
+
+            formatted_results = "\n".join(context_list)
 
             prompt = self.PROMPT_TEMPLATE.format(
-                retrieved_results=formatted_results,
-                user_query=user_query
+                user_query=user_query,
+                retrieved_results=formatted_results
             )
 
             chat_completion = client.chat.completions.create(
                 messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
+                    {"role": "system", "content": "You are a helpful shopping assistant."},
+                    {"role": "user", "content": prompt}
                 ],
                 model=model_name,
+                temperature=0.5, # Lower temperature for more factual answers
             )
 
-            generation = chat_completion.choices[0].message.content
-            return generation
+            return chat_completion.choices[0].message.content
+
         except Exception as e:
-            print(f"Error during RAG generation: {e}")
-            return DEFAULT_ANSWER
+            print(f"RAG Error: {e}")
+            return "I'm sorry, I couldn't generate a summary at this moment."
