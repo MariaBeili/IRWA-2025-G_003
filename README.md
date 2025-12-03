@@ -74,10 +74,27 @@ We implemented a basic tracking system. We capture:
 ----
 ### How to Run 
 ####  Prerequisites 
-1. Ensure you have generated the index first (Part 2):
-```bash
-python project_progress/part_2/run_search.py
-```
+    1. **Ensure you have generated the index first (Part 2)**:
+    ```bash
+    python project_progress/part_2/run_search.py
+    ```
+    2. **Install the gensim module**: First of all, you will have to run the following command to be able to read the word embeddings.
+    ```bash
+    pip install gensim
+    ```
+    3. **Download the word embeddings**: Then, download the word2vec model from this link and store it in the resources folder.
+    https://www.kaggle.com/datasets/suraj520/googlenews-vectors-negative300bingz-gz-format?resource=download
+
+    4. **Create a directory**: Create a folder named `resources` in the root directory of the project.
+    5. **Place the file**: Move the downloaded `.bin` file into the `resources/` folder.
+
+           **Directory Structure:**
+           ```text
+           project-root/
+           ├── resources/
+           │   └── GoogleNews-vectors-negative300.bin
+           ├── main.py
+           └── README.md
 #### Execution
 Prrepare and activate virtualenv for the project and run the web server from the root directory:
 ```bash
@@ -184,6 +201,7 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
 
 
 
