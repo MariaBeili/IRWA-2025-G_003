@@ -1,8 +1,8 @@
 import os
 from json import JSONEncoder
 import time
-import httpagentparser  # for getting the user agent as json
-from flask import Flask, render_template, session, request, jsonify
+import httpagentparser
+from flask import Flask, render_template, session, request, jsonify, make_response
 from project_progress.part_1.data_preparation import ProcessedDocument
 from myapp.analytics.analytics_data import AnalyticsData
 from myapp.search.load_corpus import load_corpus
@@ -35,12 +35,8 @@ path, filename = os.path.split(full_path)
 file_path = path + "/" + os.getenv("DATA_FILE_PATH")
 corpus = load_corpus(file_path)
 
-# Initialize Search Engine
-# search_engine = SearchEngine(corpus=corpus) # Uncomment if building index from scratch
-
 @app.route('/')
 def home():
-    # Generate a simple session ID for analytics if not present
     if 'uid' not in session:
         import uuid
         session['uid'] = str(uuid.uuid4())
@@ -61,7 +57,6 @@ def search_form_post():
     agent_data = httpagentparser.detect(user_agent_str)
     user_ip = request.remote_addr
     
-    # Save the query with full context (Browser, OS, IP, Session, RANKING METHOD)
     analytics_data.save_query_event(
         query=search_query,
         session_id=session.get('uid', 'anonymous'), 
@@ -92,7 +87,6 @@ def search_form_post():
         found_counter=len(results),
         rag_response=rag_response,
         search_time=f"{end_time - start_time:.4f}",
-        # Pass the query so we can track it if the user clicks a doc
         last_query=search_query 
     )
 
@@ -112,22 +106,33 @@ def doc_details():
     if not doc:
         return render_template('doc_details.html', doc=None, page_title="Not Found")
 
-    return render_template('doc_details.html', doc=doc, page_title=doc.title)
+    # 3. Render Template with Cache Control
+    # We pass 'pid' explicitly to ensure the template has it for JS logging
+    response = make_response(render_template('doc_details.html', doc=doc, pid=clicked_doc_id, page_title=doc.title))
+    
+    # Add headers to prevent caching so clicks are tracked on every visit (even 'Back' button)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    
+    return response
 
 
 @app.route('/api/log_dwell_time', methods=['POST'])
 def log_dwell_time():
     """
     API endpoint to receive JSON data about how long a user spent on a page.
-    Expected JSON: { "pid": "123", "time_spent": 5.4 }
     """
-    data = request.get_json()
+    # use force=True to handle cases where sendBeacon content-type might vary
+    data = request.get_json(force=True, silent=True)
+    
     if not data:
         return jsonify({"status": "error", "message": "No data provided"}), 400
     
     pid = data.get('pid')
     time_spent = data.get('time_spent')
     
+    # Check if pid is not None/Empty and time_spent exists
     if pid and time_spent is not None:
         analytics_data.save_dwell_time_event(
             doc_id=pid,
@@ -144,12 +149,9 @@ def dashboard():
     """
     Analytics Dashboard displaying Vega-Lite charts
     """
-    # Existing charts
     browser_chart = analytics_data.plot_browser_distribution()
     query_chart = analytics_data.plot_top_queries()
     time_chart = analytics_data.plot_clicks_over_time()
-
-    # New charts
     ranking_chart = analytics_data.plot_ranking_method_usage()
     top_items_chart = analytics_data.plot_top_clicked_items()
     dwell_chart = analytics_data.plot_dwell_time_distribution()

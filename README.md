@@ -85,15 +85,19 @@ We focused on three main goals:
     ```bash
     python project_progress/part_2/run_search.py
     ```
-  3. **Install the gensim module**: First of all, you will have to run the following command to be able to read the word embeddings.
+
+  2. **Install the gensim module**: First of all, you will have to run the following command to be able to read the word embeddings.
     ```bash
     pip install gensim
     ```
-  4. **Download the word embeddings**: Then, download the word2vec model from this link and store it in the resources folder.
+    Also in requirements.txt if you prefer using that.
+
+  3. **Download the word embeddings**: Then, download the word2vec model from this link and store it in the resources folder.
     https://www.kaggle.com/datasets/suraj520/googlenews-vectors-negative300bingz-gz-format?resource=download
 
-  5. **Create a directory**: Create a folder named `resources` in the root directory of the project.
-  6. **Place the file**: Move the downloaded `.bin` file into the `resources/` folder.
+  4. **Create a directory**: Create a folder named `resources` in the root directory of the project.
+
+  5. **Place the file**: Move the downloaded `.bin` file into the `resources/` folder.
 
       **Directory Structure:**
      ```text

@@ -7,22 +7,17 @@ class AnalyticsData:
     An in-memory persistence object using a Star Schema-like structure.
     """
 
-    # FACT TABLE: Stores Search Query Events
-    # Schema: {timestamp, query, session_id, browser, os, ip_address, ranking_method}
-    fact_queries = []
+    def __init__(self):
+        # FACT TABLE: Stores Search Query Events
+        self.fact_queries = []
 
-    # FACT TABLE: Stores Click Events
-    # Schema: {timestamp, doc_id, related_query}
-    fact_clicks = []
+        # FACT TABLE: Stores Click Events
+        self.fact_clicks = []
 
-    # FACT TABLE: Stores Dwell Time (Time Spent on Page)
-    # Schema: {timestamp, doc_id, time_spent, session_id}
-    fact_dwell_times = []
+        # FACT TABLE: Stores Dwell Time (Time Spent on Page)
+        self.fact_dwell_times = []
 
     def save_query_event(self, query: str, session_id: str, user_agent: dict, ip: str, ranking_method: str):
-        """
-        Logs a search query event with context, including the ranking method used.
-        """
         event = {
             "timestamp": datetime.now(),
             "query": query,
@@ -36,9 +31,6 @@ class AnalyticsData:
         print(f"Logged Query: {event}")
 
     def save_click_event(self, doc_id: str, query: str):
-        """
-        Logs a document click event (PID selection).
-        """
         event = {
             "timestamp": datetime.now(),
             "doc_id": doc_id,
@@ -48,9 +40,6 @@ class AnalyticsData:
         print(f"Logged Click: {event}")
 
     def save_dwell_time_event(self, doc_id: str, time_spent: float, session_id: str):
-        """
-        Logs the time spent on a specific document/product page.
-        """
         event = {
             "timestamp": datetime.now(),
             "doc_id": doc_id,
@@ -63,9 +52,6 @@ class AnalyticsData:
     ### VISUALIZATIONS FOR DASHBOARD ###
 
     def plot_browser_distribution(self):
-        """
-        Donut chart showing which browsers users are using.
-        """
         if not self.fact_queries:
             return None
         
@@ -80,9 +66,6 @@ class AnalyticsData:
         return chart.to_json()
 
     def plot_top_queries(self):
-        """
-        Bar chart of the most frequent search terms.
-        """
         if not self.fact_queries:
             return None
 
@@ -97,9 +80,6 @@ class AnalyticsData:
         return chart.to_json()
 
     def plot_clicks_over_time(self):
-        """
-        Line chart showing clicks per hour/minute.
-        """
         if not self.fact_clicks:
             return None
 
@@ -114,15 +94,11 @@ class AnalyticsData:
         return chart.to_json()
 
     def plot_ranking_method_usage(self):
-        """
-        Bar chart showing which search methods (TF-IDF, BM25, etc.) are used most.
-        """
         if not self.fact_queries:
             return None
 
         df = pd.DataFrame(self.fact_queries)
 
-        # Handle cases where older data might miss the key
         if 'ranking_method' not in df.columns:
             return None
 
@@ -135,9 +111,6 @@ class AnalyticsData:
         return chart.to_json()
 
     def plot_top_clicked_items(self):
-        """
-        Bar chart showing the specific PIDs (Doc IDs) that were clicked.
-        """
         if not self.fact_clicks:
             return None
 
@@ -152,9 +125,6 @@ class AnalyticsData:
         return chart.to_json()
 
     def plot_dwell_time_distribution(self):
-        """
-        Histogram showing the distribution of time spent on pages.
-        """
         if not self.fact_dwell_times:
             return None
 

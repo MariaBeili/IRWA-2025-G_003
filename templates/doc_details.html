@@ -73,25 +73,23 @@
         <script type="text/javascript">
             (function() {
                 let startTime = Date.now();
-                // We use the Jinja2 variable for the ID. 
-                // Ensure your Document object has an 'id' attribute or change this to 'pid'.
-                let pid = "{{ doc.id }}"; 
+                // FIX: Use the 'pid' passed explicitly from Flask, rather than assuming doc.id exists
+                let pid = "{{ pid }}"; 
 
-                // Event listener for when the user leaves the page
                 window.addEventListener("beforeunload", function() {
                     let endTime = Date.now();
                     let timeSpent = (endTime - startTime) / 1000; // Convert ms to seconds
 
-                    // Prepare data
-                    let data = JSON.stringify({
-                        pid: pid,
-                        time_spent: timeSpent
-                    });
+                    if (pid) {
+                        let data = JSON.stringify({
+                            pid: pid,
+                            time_spent: timeSpent
+                        });
 
-                    // Use sendBeacon for reliable transmission during page unload
-                    // We must use a Blob to send JSON headers with sendBeacon
-                    let blob = new Blob([data], {type: 'application/json'});
-                    navigator.sendBeacon("/api/log_dwell_time", blob);
+                        // sendBeacon is reliable for page unload events
+                        let blob = new Blob([data], {type: 'application/json'});
+                        navigator.sendBeacon("/api/log_dwell_time", blob);
+                    }
                 });
             })();
         </script>
