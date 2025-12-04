@@ -3,9 +3,8 @@ import numpy as np
 import pickle
 import os
 import time
-from gensim.models import KeyedVectors
 from project_progress.part_2.query_preparation import process_query
-from project_progress.part_3.ranking import rank_tfidf_cosine, rank_bm25, load_index, rank_word2vec_cos
+from project_progress.part_3.ranking import rank_tfidf_cosine, rank_bm25, load_index
 
 from myapp.search.objects import Document
 from project_progress.part_1.data_preparation import ProcessedDocument
@@ -51,7 +50,7 @@ class SearchEngine:
         """
         Initializes the Search Engine by loading:
         1. The TF-IDF inverted index (built in Part 2).
-        2. The Word2Vec model (optional, for Part 3 advanced ranking).
+        2. The BM25 and custom model (optional, for Part 3 advanced ranking).
         """
         print("Initializing Search Engine...")
 
@@ -93,27 +92,6 @@ class SearchEngine:
             index_time = time.time() - start_time
             print(f"Index built in {index_time:.4f} seconds.\n")
         
-        # 2. Load Word2Vec model (Google News vectors)
-        # This path must match where you saved the .bin file
-        # Adjust 'project_progress/part_3/' if your file is elsewhere
-        path_to_w2v = "resources/GoogleNews-vectors-negative300.bin"
-
-        if os.path.exists(path_to_w2v):
-            print("Loading Word2Vec model (GoogleNews)... this may take a while.")
-            try:
-                # We limit to 500,000 words to save RAM. Remove 'limit' to load all.
-                self.word2vec_model = KeyedVectors.load_word2vec_format(
-                    path_to_w2v, 
-                    binary=True, 
-                    limit=500000 
-                )
-                print("Word2Vec model loaded successfully!")
-            except Exception as e:
-                print(f"Error loading Word2Vec: {e}")
-                self.word2vec_model = None
-        else:
-            print(f"Warning: Word2Vec model not found at {path_to_w2v}. Word2Vec ranking will fail.")
-            self.word2vec_model = None
 
     def search(self, query, corpus=None, method="tfidf", topN=20):
         """
@@ -140,22 +118,13 @@ class SearchEngine:
             # Part 3 BM25 ranking
             # Check if your rank_bm25 needs 'tf' or just 'idf' based on your implementation
             # Assuming it takes (query, index, idf) or similar. Adjust arguments if needed.
+
             try:
-                results = rank_bm25(query_terms, self.index, self.idf)
-            except TypeError:
-                # Fallback if arguments differ in your specific implementation
+                results = rank_bm25(query_terms, self.index, self.tf, self.idf)
+            except Exception as e:
+                print(f"Error in BM25: {e}. Falling back to TF-IDF.")
                 results = rank_tfidf_cosine(query_terms, self.index, self.tf, self.idf)
-            
-        elif method == "word2vec":
-            # Part 3 Word Embeddings ranking
-            if self.word2vec_model:
-                # Note: rank_word2vec_cos typically needs document vectors.
-                # If your implementation calculates them on the fly, this works.
-                # If it needs pre-calculated vectors, pass 'doc_vectors' here.
-                results = rank_word2vec_cos(query_terms, self.word2vec_model, corpus)
-            else:
-                print("Word2Vec model not loaded. Falling back to TF-IDF.")
-                results = rank_tfidf_cosine(query_terms, self.index, self.tf, self.idf)
+
                 
         elif method == "custom":
             # Part 3 Custom Score (e.g., TF-IDF boosted by rating)
