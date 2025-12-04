@@ -1,50 +1,97 @@
-import json
-import random
-import altair as alt
 import pandas as pd
-
+import altair as alt
+from datetime import datetime
 
 class AnalyticsData:
     """
-    An in memory persistence object.
-    Declare more variables to hold analytics tables.
+    An in-memory persistence object using a Star Schema-like structure.
     """
-    # Example of statistics table
-    # fact_clicks is a dictionary with the click counters: key = doc id | value = click counter
-    fact_clicks = dict([])
 
-    ### Please add your custom tables here:
+    # FACT TABLE: Stores Search Query Events
+    # Schema: {timestamp, query, session_id, browser, os, ip_address}
+    fact_queries = []
 
-    def save_query_terms(self, terms: str) -> int:
-        print(self)
-        return random.randint(0, 100000)
-    
-    def plot_number_of_views(self):
-        # Prepare data
-        data = [{'Document ID': doc_id, 'Number of Views': count} for doc_id, count in self.fact_clicks.items()]
-        df = pd.DataFrame(data)
-        # Create Altair chart
+    # FACT TABLE: Stores Click Events
+    # Schema: {timestamp, doc_id, related_query}
+    fact_clicks = []
+
+    def save_query_event(self, query: str, session_id: str, user_agent: dict, ip: str):
+        """
+        Logs a search query event with context.
+        """
+        event = {
+            "timestamp": datetime.now(),
+            "query": query,
+            "session_id": session_id,
+            "browser": user_agent.get('browser', {}).get('name', 'Unknown'),
+            "os": user_agent.get('os', {}).get('name', 'Unknown'),
+            "ip_address": ip
+        }
+        self.fact_queries.append(event)
+        # Print for debugging
+        print(f"Logged Query: {event}")
+
+    def save_click_event(self, doc_id: str, query: str):
+        """
+        Logs a document click event.
+        """
+        event = {
+            "timestamp": datetime.now(),
+            "doc_id": doc_id,
+            "related_query": query  # Links the click back to the search
+        }
+        self.fact_clicks.append(event)
+        print(f"Logged Click: {event}")
+
+    ### VISUALIZATIONS FOR DASHBOARD ###
+
+    def plot_browser_distribution(self):
+        """
+        Donut chart showing which browsers users are using.
+        """
+        if not self.fact_queries:
+            return None
+        
+        df = pd.DataFrame(self.fact_queries)
+        
+        chart = alt.Chart(df).mark_arc(innerRadius=50).encode(
+            theta=alt.Theta("count()", stack=True),
+            color=alt.Color("browser", legend=alt.Legend(title="Browser")),
+            tooltip=["browser", "count()"]
+        ).properties(title="User Browser Distribution")
+        
+        return chart.to_json()
+
+    def plot_top_queries(self):
+        """
+        Bar chart of the most frequent search terms.
+        """
+        if not self.fact_queries:
+            return None
+
+        df = pd.DataFrame(self.fact_queries)
+        
         chart = alt.Chart(df).mark_bar().encode(
-            x='Document ID',
-            y='Number of Views'
-        ).properties(
-            title='Number of Views per Document'
-        )
-        # Render the chart to HTML
-        return chart.to_html()
+            x=alt.X('count()', title='Frequency'),
+            y=alt.Y('query', sort='-x', title='Search Terms'),
+            tooltip=['query', 'count()']
+        ).properties(title="Top Search Queries")
+        
+        return chart.to_json()
 
-
-class ClickedDoc:
-    def __init__(self, doc_id, description, counter):
-        self.doc_id = doc_id
-        self.description = description
-        self.counter = counter
-
-    def to_json(self):
-        return self.__dict__
-
-    def __str__(self):
+    def plot_clicks_over_time(self):
         """
-        Print the object content as a JSON string
+        Line chart showing clicks per hour/minute.
         """
-        return json.dumps(self)
+        if not self.fact_clicks:
+            return None
+
+        df = pd.DataFrame(self.fact_clicks)
+        
+        chart = alt.Chart(df).mark_line(point=True).encode(
+            x=alt.X('timestamp', timeUnit='hoursminutes', title='Time'),
+            y=alt.Y('count()', title='Number of Clicks'),
+            tooltip=['timestamp', 'count()']
+        ).properties(title="Clicks Over Time")
+
+        return chart.to_json()

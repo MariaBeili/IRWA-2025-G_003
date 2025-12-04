@@ -2,30 +2,70 @@
 {% block page_title %}{{ page_title }}{% endblock %}
 
 {% block header %}
-    <!-- Next tag loads Charts.js https://www.chartjs.org/docs/latest/ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.2/chart.min.js"
-            integrity="sha512-tMabqarPtykgDtdtSqCL3uLVM0gS1ZkUAVhRFu1vSEFgvB73niFQWJuvviDyBGBH22Lcau4rHB5p2K2T0Xvr6Q=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+    
+    <style>
+        .chart-container { width: 100%; margin-bottom: 50px; }
+    </style>
 {% endblock %}
 
 {% block content %}
 
-    <!--
-    Examples of what to show in Dashboard:
+<div class="container mt-4">
+    <h2 class="mb-4">Analytics Dashboard</h2>
 
-    - Ranking of visited documents (from results page)
-    - Visitor's preferred browsers
-    - Visitor's city (from IP)
-    - preferred queries ranking
-    - preferred terms
-    - etc.
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">Top Search Queries</div>
+                <div class="card-body">
+                    <div id="vis_queries" class="chart-container"></div>
+                    {% if not query_chart %} <p class="text-muted">No data available yet.</p> {% endif %}
+                </div>
+            </div>
+        </div>
 
-    -->
+        <div class="col-md-6">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">Visitor Browsers</div>
+                <div class="card-body">
+                    <div id="vis_browser" class="chart-container"></div>
+                    {% if not browser_chart %} <p class="text-muted">No data available yet.</p> {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <h3>Dashboard</h3>
-    <iframe src="/plot_number_of_views" width="600" height="400" style="border: none;"></iframe>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">Clicks Over Time</div>
+                <div class="card-body">
+                    <div id="vis_time" class="chart-container"></div>
+                    {% if not time_chart %} <p class="text-muted">No data available yet.</p> {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script type="text/javascript">
+    // Parse the JSON strings passed from Flask
+    // We use the | safe filter to ensure Jinja2 renders the JSON string as-is
+    
+    {% if browser_chart %}
+        vegaEmbed('#vis_browser', {{ browser_chart | safe }});
+    {% endif %}
+
+    {% if query_chart %}
+        vegaEmbed('#vis_queries', {{ query_chart | safe }});
+    {% endif %}
+
+    {% if time_chart %}
+        vegaEmbed('#vis_time', {{ time_chart | safe }});
+    {% endif %}
+</script>
 
 {% endblock %}
-
-
