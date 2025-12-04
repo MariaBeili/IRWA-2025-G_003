@@ -50,7 +50,7 @@ def home():
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
-    selected_method = request.form.get('ranking-method')
+    selected_method = request.form.get('ranking-method', 'tfidf')
     
     # --- ANALYTICS TRACKING START ---
     user_agent_str = request.headers.get('User-Agent')
@@ -68,7 +68,7 @@ def search_form_post():
 
     # 1. Run Search
     start_time = time.time()
-    ranked_pids = search_engine.search(query=search_query, corpus=corpus, method=selected_method, topN=20) 
+    ranked_pids = search_engine.search(query=search_query, corpus=corpus, method=selected_method, topN=20)
     end_time = time.time()
 
     # 2. Get full objects
