@@ -2,6 +2,8 @@ import os
 from groq import Groq
 from dotenv import load_dotenv
 
+from project_progress.part_1.data_preparation import ProcessedDocument
+
 load_dotenv()
 
 class RAGGenerator:
@@ -11,7 +13,7 @@ class RAGGenerator:
     
     User Query: "{user_query}"
     
-    Here are the top products found (Format: ID | Name | Price | Rating | Description):
+    Here are the top products found (Format: ID | Name | Selling Price | Actual Price | Rating | Brand | Category | Seller | Discount | Product Details | Out of Stock | Description):
     {retrieved_results}
     
     INSTRUCTIONS:
@@ -21,6 +23,7 @@ class RAGGenerator:
     4. If there is a good alternative (e.g., cheaper or different style), mention it.
     5. Keep the tone helpful and professional.
     6. If NO products match the query well, say exactly: "I couldn't find any products that perfectly match your request."
+    7. If the product is out of stock (the bool is true), do not recommend it.
     
     Output your response in clear, concise paragraphs. Do not use Markdown formatting like **bold** or # Headers, just plain text is fine.
     """
@@ -42,14 +45,24 @@ class RAGGenerator:
             # We limit to top_N (e.g., 5) to save tokens and focus on best results
             context_list = []
             for doc in retrieved_results[:top_N]:
-                # Handle dictionary or object access safely
-                pid = getattr(doc, 'pid', doc.get('pid', 'N/A'))
-                title = getattr(doc, 'title', doc.get('title', 'N/A'))
-                price = getattr(doc, 'selling_price', doc.get('selling_price', 'N/A'))
-                rating = getattr(doc, 'average_rating', doc.get('average_rating', 'N/A'))
-                desc = getattr(doc, 'description', doc.get('description', ''))[:150] # Truncate desc
-                
-                context_list.append(f"{pid} | {title} | {price} | {rating} | {desc}...")
+                processed_doc = ProcessedDocument.from_document(doc)
+                processed_doc.process_fields()
+
+                pid = processed_doc.pid or "N/A"
+                title = processed_doc.title or "N/A"
+                selling_price = processed_doc.selling_price or "N/A"
+                actual_price = processed_doc.actual_price or "N/A"
+                rating = processed_doc.average_rating or "N/A"
+                brand = processed_doc.brand or "N/A"
+                category = processed_doc.category or "N/A"
+                seller = processed_doc.seller or "N/A"
+                discount = processed_doc.discount or "N/A"
+                product_details = processed_doc.product_details or "N/A"
+                out_of_stock = processed_doc.out_of_stock
+                desc = (processed_doc.description or "")[:150]
+
+                context_list.append(f"{pid} | {title} | {selling_price} | {actual_price} | {rating} | {brand} | {category} | {seller} | {discount} | {product_details} | {out_of_stock} | {desc}...")
+
 
             formatted_results = "\n".join(context_list)
 
