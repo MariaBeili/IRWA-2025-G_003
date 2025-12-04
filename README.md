@@ -57,7 +57,7 @@ We focused on three main goals:
     
   2. **Multi-Algorithm Search Page**: We added a dropdown menu in the UI that allows the user to select the ranking algorithm dynamically:
       * TF-IDF: The baseline method.
-      * BM25: Probabilistic ranking (usually better precision).
+      * BM25: Probabilistic ranking (usually better precision, but slow searchin, wait a little).
       * Custom: Our own score combining TF-IDF with Product Rating.
     
   3. **Analytics Dashboard**: We implemented a basic tracking system. We capture:
@@ -192,6 +192,7 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
 
 
 
