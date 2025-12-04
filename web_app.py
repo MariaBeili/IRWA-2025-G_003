@@ -8,7 +8,6 @@ from flask import Flask, render_template, session
 from flask import request
 
 from project_progress.part_1.data_preparation import ProcessedDocument
-from project_progress.part_2.indexing import create_index_tfidf, search_tfidf
 
 from myapp.analytics.analytics_data import AnalyticsData, ClickedDoc
 from myapp.search.load_corpus import load_corpus
@@ -46,6 +45,10 @@ full_path = os.path.realpath(__file__)
 path, filename = os.path.split(full_path)
 file_path = path + "/" + os.getenv("DATA_FILE_PATH")
 corpus = load_corpus(file_path)
+
+# Only if you want to create index from zero (takes 3min+) and hide the other engine creation above
+# search_engine = SearchEngine(corpus=corpus)
+
 # Log first element of corpus to verify it loaded correctly:
 print("\nCorpus is loaded... \n First element:\n", list(corpus.values())[0])
 
@@ -53,56 +56,6 @@ print("\nCorpus is loaded... \n First element:\n", list(corpus.values())[0])
 processed_doc = ProcessedDocument.from_document(list(corpus.values())[0])
 processed_doc.process_fields()
 print("\nFirst processed element:\n", processed_doc)
-
-# Example documents
-print("Processing documents...")
-start_time = time.time()
-
-processed_corpus = [None] * len(corpus)
-
-for i in range(len(corpus)):
-    processed_corpus[i] = ProcessedDocument.from_document(list(corpus.values())[i])
-    processed_corpus[i].process_fields()
-
-process_time = time.time() - start_time
-print(f"Documents processed in {process_time:.4f} seconds.\n")
-
-
-# Time the index creation
-print("Building inverted index and computing TF-IDF...")
-start_time = time.time()
-
-index, tf, df, idf, title_index = create_index_tfidf(processed_corpus)
-
-index_time = time.time() - start_time
-print(f"Index built in {index_time:.4f} seconds.\n")
-
-
-# Define queries
-query1 = "ARBO cotton track pants for men"
-query2 = "Multicolor track pants combo ECKO"
-query3 = "Black solid women track pants"
-query4 = "Elastic waist cotton blend track pants"
-query5 = "Self design multicolor track pants"
-
-queries = [query1, query2, query3, query4, query5]
-
-
-# Run and time searches
-for i, query in enumerate(queries, start=1):
-    print(f"\nQuery {i}: {query}")
-    start_time = time.time()
-    ranked_docs = search_tfidf(query, index, tf, idf)
-    search_time = time.time() - start_time
-    print(f"Search completed in {search_time:.4f} seconds.")
-
-    if not ranked_docs:
-        print("No matching documents found.")
-    else:
-        print("Ranked results:")
-        for rank, doc_id in enumerate(ranked_docs, start=1):
-            title = title_index.get(doc_id, "Unknown Title")
-            print(f"{rank}. {title} (doc_pid={doc_id})")
 
 
 
@@ -131,12 +84,13 @@ def home():
 @app.route('/search', methods=['POST'])
 def search_form_post():
     search_query = request.form['search-query']
+    selected_method = request.form.get('ranking-method')
     analytics_data.save_query_terms(search_query)
 
     # 1. Run Search
     start_time = time.time()
     # Call your search logic (Part 2/3)
-    ranked_pids = search_tfidf(search_query, index, tf, idf) 
+    ranked_pids = search_engine.search(query=search_query, corpus=corpus, method=selected_method, topN=20) 
     end_time = time.time()
 
     # 2. Get full objects
@@ -180,7 +134,6 @@ def doc_details():
     if not doc:
         return render_template('doc_details.html', doc=None, page_title="Not Found")
 
-    # --- THE FIX IS HERE ---
     # We use 'doc.title' (dot notation), NOT 'doc.get("title")'
     print(f"Found document: {doc.title}") 
 

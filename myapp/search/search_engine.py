@@ -2,11 +2,14 @@ import random
 import numpy as np
 import pickle
 import os
+import time
 from gensim.models import KeyedVectors
 from project_progress.part_2.query_preparation import process_query
 from project_progress.part_3.ranking import rank_tfidf_cosine, rank_bm25, load_index, rank_word2vec_cos
 
 from myapp.search.objects import Document
+from project_progress.part_1.data_preparation import ProcessedDocument
+from project_progress.part_2.indexing import create_index_tfidf
 
 
 def dummy_search(corpus: dict, search_id, num_results=20):
@@ -44,7 +47,7 @@ class SearchEngine:
     It loads the necessary indices and models at startup and provides a search method.
     """
     
-    def __init__(self):
+    def __init__(self, corpus=None):
         """
         Initializes the Search Engine by loading:
         1. The TF-IDF inverted index (built in Part 2).
@@ -52,20 +55,49 @@ class SearchEngine:
         """
         print("Initializing Search Engine...")
 
-        # 1. Load prebuilt TF-IDF / BM25 indices from the pickle file
-        # ensure 'project_progress/part_2/irwa_index.pkl' exists
-        try:
-            self.index, self.tf, self.idf, self.title_index = load_index()
-            print("TF-IDF Index loaded successfully.")
-        except Exception as e:
-            print(f"Error loading TF-IDF index: {e}")
-            self.index, self.tf, self.idf = {}, {}, {}
 
+        if corpus == None:
+            print("Loading Presaved Index...")
+            # 1. Load prebuilt TF-IDF / BM25 indices from the pickle file
+            # ensure 'project_progress/part_2/irwa_index.pkl' exists
+            try:
+                self.index, self.tf, self.idf, self.title_index = load_index()
+                print("TF-IDF Index loaded successfully.")
+            except Exception as e:
+                print(f"Error loading TF-IDF index: {e}")
+                self.index, self.tf, self.idf = {}, {}, {}
+        
+        else:
+            print("Calculating Index from Corpus...")
+            
+            # Example documents
+            print("Processing documents...")
+            start_time = time.time()
+
+            processed_corpus = [None] * len(corpus)
+
+            for i in range(len(corpus)):
+                processed_corpus[i] = ProcessedDocument.from_document(list(corpus.values())[i])
+                processed_corpus[i].process_fields()
+
+            process_time = time.time() - start_time
+            print(f"Documents processed in {process_time:.4f} seconds.\n")
+
+
+            # Time the index creation
+            print("Building inverted index and computing TF-IDF...")
+            start_time = time.time()
+
+            self.index, self.tf, df, self.idf, self.title_index = create_index_tfidf(processed_corpus)
+
+            index_time = time.time() - start_time
+            print(f"Index built in {index_time:.4f} seconds.\n")
+        
         # 2. Load Word2Vec model (Google News vectors)
         # This path must match where you saved the .bin file
         # Adjust 'project_progress/part_3/' if your file is elsewhere
         path_to_w2v = "resources/GoogleNews-vectors-negative300.bin"
-        
+
         if os.path.exists(path_to_w2v):
             print("Loading Word2Vec model (GoogleNews)... this may take a while.")
             try:
@@ -83,7 +115,7 @@ class SearchEngine:
             print(f"Warning: Word2Vec model not found at {path_to_w2v}. Word2Vec ranking will fail.")
             self.word2vec_model = None
 
-    def search(self, query, search_id=None, corpus=None, method="tfidf"):
+    def search(self, query, corpus=None, method="tfidf", topN=20):
         """
         Main search function.
         
@@ -155,24 +187,9 @@ class SearchEngine:
             # Default fallback
             results = rank_tfidf_cosine(query_terms, self.index, self.tf, self.idf)
 
-        # 3. Format the Output for the UI
-        # 'results' is currently a list of (PID, Score) tuples.
-        # We need to convert this into a list of dictionaries with full data.
-        docs = []
-        for pid, score in results[:20]: # Return top 20
-            d = corpus.get(pid)
-            if d:
-                docs.append({
-                    "pid": pid,
-                    "title": d.title,
-                    "description": d.description, # Full description
-                    "selling_price": d.selling_price,
-                    "discount": d.discount,
-                    "actual_price": d.actual_price,
-                    "average_rating": d.average_rating,
-                    "url": d.url,
-                    "images": d.images,
-                    "score": round(score, 4) # Useful for debugging display
-                })
-                
-        return docs
+        pids = []
+
+        for pid, score in results[:topN]:
+            pids.append(pid)
+
+        return pids
