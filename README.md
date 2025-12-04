@@ -42,11 +42,20 @@ We focused on three main goals:
 ----
 ### Implementation
 #### USER INTERFACE 
-  1. **Optimized Web Application (web_app.py)**: We encountered a major efficiency problem in the provided template: it rebuilt the index from scratch every time the server started (taking ~3 minutes).
-    The Fix: We modified the startup logic to load the pre-computed index (irwa_index.pkl) generated in Part 2.
-    Result: The application now starts instantly (<1 second) and search results appear immediately.
+  1. **Results Page**: In `results.html`, the retrieved results are displayed nicely with Bootstrap cards:
+      - Product image  
+      - Title (link to details page)  
+      - Short description  
+      - Selling price, actual price, discount  
+      - Average rating stars  
+      - A button linking to the **details page**  
+      - A link to visit the **original product website**
+      
+      We also added:
+      - The number of results and query execution time.  
+      - A clear header with the query and the algorithm used. 
     
-  2. **Multi-Algorithm Search**: We added a dropdown menu in the UI that allows the user to select the ranking algorithm dynamically:
+  2. **Multi-Algorithm Search Page**: We added a dropdown menu in the UI that allows the user to select the ranking algorithm dynamically:
       * TF-IDF: The baseline method.
       * BM25: Probabilistic ranking (usually better precision).
       * Word2Vec: Semantic search (finding context, not just keywords).
@@ -201,6 +210,7 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
 
 
 
