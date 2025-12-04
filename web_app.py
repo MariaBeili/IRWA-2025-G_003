@@ -2,7 +2,7 @@ import os
 from json import JSONEncoder
 import time
 import httpagentparser  # for getting the user agent as json
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, jsonify
 from project_progress.part_1.data_preparation import ProcessedDocument
 from myapp.analytics.analytics_data import AnalyticsData
 from myapp.search.load_corpus import load_corpus
@@ -61,12 +61,13 @@ def search_form_post():
     agent_data = httpagentparser.detect(user_agent_str)
     user_ip = request.remote_addr
     
-    # Save the query with full context (Browser, OS, IP, Session)
+    # Save the query with full context (Browser, OS, IP, Session, RANKING METHOD)
     analytics_data.save_query_event(
         query=search_query,
         session_id=session.get('uid', 'anonymous'), 
         user_agent=agent_data,
-        ip=user_ip
+        ip=user_ip,
+        ranking_method=selected_method
     )
     # --- ANALYTICS TRACKING END ---
 
@@ -114,21 +115,54 @@ def doc_details():
     return render_template('doc_details.html', doc=doc, page_title=doc.title)
 
 
+@app.route('/api/log_dwell_time', methods=['POST'])
+def log_dwell_time():
+    """
+    API endpoint to receive JSON data about how long a user spent on a page.
+    Expected JSON: { "pid": "123", "time_spent": 5.4 }
+    """
+    data = request.get_json()
+    if not data:
+        return jsonify({"status": "error", "message": "No data provided"}), 400
+    
+    pid = data.get('pid')
+    time_spent = data.get('time_spent')
+    
+    if pid and time_spent is not None:
+        analytics_data.save_dwell_time_event(
+            doc_id=pid,
+            time_spent=float(time_spent),
+            session_id=session.get('uid', 'anonymous')
+        )
+        return jsonify({"status": "success"}), 200
+    
+    return jsonify({"status": "error", "message": "Invalid data"}), 400
+
+
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
     """
     Analytics Dashboard displaying Vega-Lite charts
     """
+    # Existing charts
     browser_chart = analytics_data.plot_browser_distribution()
     query_chart = analytics_data.plot_top_queries()
     time_chart = analytics_data.plot_clicks_over_time()
+
+    # New charts
+    ranking_chart = analytics_data.plot_ranking_method_usage()
+    top_items_chart = analytics_data.plot_top_clicked_items()
+    dwell_chart = analytics_data.plot_dwell_time_distribution()
 
     return render_template(
         'dashboard.html',
         page_title="Analytics Dashboard",
         browser_chart=browser_chart,
         query_chart=query_chart,
-        time_chart=time_chart
+        time_chart=time_chart,
+        ranking_chart=ranking_chart,
+        top_items_chart=top_items_chart,
+        dwell_chart=dwell_chart
     )
 
 if __name__ == "__main__":
