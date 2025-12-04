@@ -58,7 +58,6 @@ We focused on three main goals:
   2. **Multi-Algorithm Search Page**: We added a dropdown menu in the UI that allows the user to select the ranking algorithm dynamically:
       * TF-IDF: The baseline method.
       * BM25: Probabilistic ranking (usually better precision).
-      * Word2Vec: Semantic search (finding context, not just keywords).
       * Custom: Our own score combining TF-IDF with Product Rating.
     
   3. **Analytics Dashboard**: We implemented a basic tracking system. We capture:
@@ -85,27 +84,6 @@ We focused on three main goals:
     ```bash
     python project_progress/part_2/run_search.py
     ```
-
-  2. **Install the gensim module**: First of all, you will have to run the following command to be able to read the word embeddings.
-    ```bash
-    pip install gensim
-    ```
-    Also in requirements.txt if you prefer using that.
-
-  3. **Download the word embeddings**: Then, download the word2vec model from this link and store it in the resources folder.
-    https://www.kaggle.com/datasets/suraj520/googlenews-vectors-negative300bingz-gz-format?resource=download
-
-  4. **Create a directory**: Create a folder named `resources` in the root directory of the project.
-
-  5. **Place the file**: Move the downloaded `.bin` file into the `resources/` folder.
-
-      **Directory Structure:**
-     ```text
-        project-root/
-          ├── resources/
-          │   └── GoogleNews-vectors-negative300.bin
-          ├── main.py
-          └── README.md
 
            
 #### Execution
@@ -214,6 +192,7 @@ git push -u origin main
 ## Attribution:
 The project is adapted from the following sources:
 - [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+
 
 
 
